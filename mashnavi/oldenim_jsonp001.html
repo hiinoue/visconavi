@@ -25,7 +25,7 @@
   td:hover {background-color: lightblue;}
   td:active {background-color: red;}
   #offline {background-color: yellow; display: none; border-style: none;}
-  #front_back {float: left; background-color: #FFFFFF; z-index: 2; opacity: 1.0;}
+  #front_back {background-color: #FFFFFF; z-index: 2; opacity: 1.0;}
   #front {background-color: #FFFFFF; height: 600px;}
   #back {background-color: white; height: 600px;}
   figure {border-radius: 5px; border-style: outset;} 
@@ -60,17 +60,6 @@
 	       </tbody>
 	      </table>
 	     </div>
-	     <div id="front_back">
-	      <canvas width="300" height="850" id="offline">
-	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
-	      </canvas>
-	      <canvas width="300" height="850" id="front" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
-	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
-	      </canvas>
-	      <canvas width="300" height="850" id="back" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
-	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
-	      </canvas>
-	     </div>
 	     <div id="waytab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
 	      <table>
 	       <tbody id="colorlist">
@@ -90,7 +79,7 @@
 	      </table>
 	     </div>
 	    </div>
-	    <!-- div id="front_back">
+	    <div id="front_back">
 	     <canvas width="300" height="850" id="offline">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
 	     </canvas>
@@ -100,7 +89,7 @@
 	     <canvas width="300" height="850" id="back" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
 	     </canvas>
-	    </div -->
+	    </div>
       </td>
       <td id="SizeData">
 	    <div id="selectSize">
