@@ -46,7 +46,6 @@ function displayColorList(icolorlist, colorarray)
 	for (i = 0; i < colorarray.length; i++)
 	{
 		var color =  colorarray[i];
-		
 		if (rowPerType)
 		{
 			type = parentTypeOf(color);
@@ -118,10 +117,26 @@ function setSelected(tlist, curIndex, newIndex)
 		return -1;
 	if (newIndex != curIndex)
 	{
+		var trelem, tdlist, tdelem
+		for (i = 0, j = 0; i < tlist.children.length; i++)
+		{
+			trelem = tlist.children[i];
+			tdlist = trelem.getElementsByTagName('td');
+			for (k = 0; k < tdlist.length; k++, j++)
+			{
+				tdelem = tdlist[k];
+				if (j == curIndex)
+					tdelem.style.backgroundColor = 'transparent';
+				if (j == newIndex)
+					tdelem.style.backgroundColor = '#99FF00';
+			}
+		/**
 		if (curIndex >= 0)
 			tlist.children[curIndex].style.backgroundColor = 'transparent';
 		if (newIndex >= 0)
 			tlist.children[newIndex].style.backgroundColor = '#99FF00';
+		**/
+		}
 	}
 	return newIndex;
 }
