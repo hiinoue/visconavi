@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html manifest="vasconavi.manifest">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0; user-scalable=no">
+<style type="text/css">
+  h2 {float: left; background: -moz-linear-gradient(top, #FF9, #9C0)}
+  #action button {margin-left: 10px;
+	  border-radius: 5px; border-style: outset; 
+	  background: -moz-linear-gradient(top, #CFF, #6CC);
+	  background: -webkit-gradient(linear, left top, left bottom, from(#CFF), to(#6CC));
+	}
+  #prev {display: none;}
+  #selectMisc {position: relative; z-index: 0; overflow: auto;}
+  #selectParts {background-color: white; z-index: 2; opacity: 1.0; width: 1024px;}
+  #selectSize {z-index: 0; background-color: white; width: 1024px; height: 700px;}
+  #itemtab {float: left; overflow: auto; width: 125px; height: 650px; background-color: white;}
+  #waytab {float: left; overflow: auto; width: 125px; height: 650px; background-color: white;}
+  #opttab figure {
+	  background: -moz-linear-gradient(top, rgba(255, 255, 200, 0.5), rgba(192, 192, 150, 0.5));
+	  background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 200, 0.5)), to(rgba(192, 192, 150, 0.5)));
+	}
+  #opttab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
+  #partstab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
+  td:hover {background-color: lightblue;}
+  td:active {background-color: red;}
+  #offline {background-color: yellow; display: none; border-style: none;}
+  #front_back {float: left; background-color: #FFFFFF; z-index: 2; opacity: 1.0;}
+  #front {background-color: #FFFFFF; height: 600px;}
+  #back {background-color: white; height: 600px;}
+  figure {border-radius: 5px; border-style: outset;} 
+  #SizeData {display: none;}
+
+  .c-both {clear: both;}
+</style>
+<title>canvasでImageを描く</title>
+<script src="js/BasketJ.js" language="javascript"></script>
+<script src="js/DisplayJsonMisc.js" language="javascript"></script>
+<script src="js/makeJsonArray.js" language="javascript"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript" src="js/olddenim_jsonp001.js" language="javascript"></script>
+
+</head>
+<body onLoad="jsonp_connect()" ongesturestart="bodyGesture(event)" ongesturechange="bodyGesture(event)">
+   <h2>HTML5 olddenim_json001 2014-11-25 15:22</h2>
+   <div id="action">
+    <br>
+    <button type="button" id="prev" onClick="prevPage()">前頁</button>
+    <button type="button" id="next" onClick="nextPage()">次頁</button>
+   </div>
+   <div class="c-both" />
+   <div id="selectMisc">
+    <table>
+     <tbody>
+      <td id="simulation">
+	    <div id="selectParts">
+	     <div id="itemtab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
+	      <table>
+	       <tbody id="itemlist">
+	       </tbody>
+	      </table>
+	     </div>
+	     <div id="front_back">
+	      <canvas width="300" height="850" id="offline">
+	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
+	      </canvas>
+	      <canvas width="300" height="850" id="front" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
+	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
+	      </canvas>
+	      <canvas width="300" height="850" id="back" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
+	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
+	      </canvas>
+	     </div>
+	     <div id="waytab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
+	      <table>
+	       <tbody id="colorlist">
+	       </tbody>
+	      </table>
+	     </div>
+	     <div id="opttab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
+	      <table>
+	       <tbody id="optlist">
+	       </tbody>
+	      </table>
+	     </div>
+	     <div id="partstab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
+	      <table>
+	       <tbody id="partslist">
+	       </tbody>
+	      </table>
+	     </div>
+	    </div>
+	    <!-- div id="front_back">
+	     <canvas width="300" height="850" id="offline">
+	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
+	     </canvas>
+	     <canvas width="300" height="850" id="front" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
+	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
+	     </canvas>
+	     <canvas width="300" height="850" id="back" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
+	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
+	     </canvas>
+	    </div -->
+      </td>
+      <td id="SizeData">
+	    <div id="selectSize">
+	   	<label>サイズ指定</label>
+		<table>
+		  <tbody>
+		   <tr id="sizelist">
+		   </tr>
+		  </tbody>
+		</table>
+	   	<label>股下指定</label>
+		<select name="股下" id="matashita">
+		</select>
+		<!--section>
+		<p>キャッシュ状況を表示します。</p>
+		<button onclick="applicationCache.update()">キャッシュを更新する</button>
+		<div id="output"></div>
+		</section -->
+	    </div>
+      </td>
+     </tbody>
+    </table>
+   </div>
+
+</body>
+</html>
