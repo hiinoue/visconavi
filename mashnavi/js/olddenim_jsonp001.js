@@ -208,7 +208,119 @@ function nextPage(event)
 		szdata.style.display = 'inline';
 		var simu = document.getElementById('simulation');
 		simu.style.display = 'none';
+		return;
 	}
+
+	var no_get;
+	var urlfile_noget = 'http://100.126.1.62/scripts/BottomsOrderno.aspx?navitype=PN&machineId=00';
+	var urlfile = 'http://100.126.1.62/scripts/BottomsOrder.aspx';
+	var use_gui_form = false; // true/false何れでもOK。blobを使用しておりそのためmultipart/form-dataが
+				  // 自然に設定されると思われる。
+	var upload_add = false;
+/***
+	var jqxhr;
+	if (no_get)
+	{
+		jqxhr = $.ajax({
+			url: urlfile_noget,
+			type: 'get',
+			dataType: 'xml'
+		});
+	}
+	else
+	{
+		var para_data = ['<waiwa del="yes" /waiwa>'];
+		var oMyForm;
+		var oMyBlob = new Blob(para_data, {type : 'text/html'}); // the blob
+		if (use_gui_form)
+		{
+			$form = $('#upload-form');
+			//var text_content = document.getElementById('upload-content');
+			//alert('content=' + text_content.textContent);
+			//text_content.textContent = para_data;
+       			oMyForm = new FormData($form[0]);
+		}
+		else
+		{
+			oMyForm = new FormData();
+		}
+
+		if (upload_add)
+			oMyForm.append('FileName', orderno + '.xml');
+		oMyForm.append('orderData', oMyBlob);
+		if (upload_add)
+			oMyForm.append('Upload', 'Submit Query');
+		jqxhr = $.ajax({
+			url: urlfile,
+			type: 'post',
+			processData: false,
+			contentType: false, // falseでなければならない。
+					　　// このcontentTypenに直接 multipart/form-data; boundary=xxxxxxx
+					    // を設定しようとしても設定したboundary要素を利用してくれない。
+			// headers: {'Content-Type' : 'multipart/form-data; boundary=axbygd'}, // contentTypeと同様
+			dataType: 'text',
+			data: oMyForm
+		});
+	}
+	jqxhr
+	  .done(function(data, status) {
+			if (no_get)
+			{
+				var order = data.getElementsByTagName('order');
+				alert('response=' + order[0].getAttribute('orderNumber'));
+			}
+			else
+				alert('response=' + data);
+		})
+	  .fail(function(jqXHR, status, errorThrown) {alert('エラー発生:' + status + ',' + jqXHR.responseText);
+		});
+	***/
+	no_get = true;	// 最初に№を取得する
+	$.ajax({
+		url: urlfile_noget,
+		type: 'get',
+		dataType: 'xml'
+		})
+	  .then(function(data, status) {
+		var order = data.getElementsByTagName('order');
+		var orderno = order[0].getAttribute('orderNumber');
+		alert('orderno=' + orderno);
+
+		no_get = false;
+		var para_data = ['<waiwa del="yes" /waiwa>'];
+		var oMyForm;
+		var oMyBlob = new Blob(para_data, {type : 'text/html'}); // the blob
+		if (use_gui_form)
+		{
+			$form = $('#upload-form');
+       			oMyForm = new FormData($form[0]);
+		}
+		else
+			oMyForm = new FormData();
+
+		if (upload_add)
+			oMyForm.append('FileName', orderno + '.xml');
+		oMyForm.append('orderData', oMyBlob);
+		if (upload_add)
+			oMyForm.append('Upload', 'Submit Query');
+		return $.ajax({
+				url: urlfile,
+				type: 'post',
+				processData: false,
+				contentType: false, // falseでなければならない。
+						　　// このcontentTypenに直接 multipart/form-data; boundary=xxxxxxx
+						    // を設定しようとしても設定したboundary要素を利用してくれない。
+				// headers: {'Content-Type' : 'multipart/form-data; boundary=axbygd'}, // contentTypeと同様
+				dataType: 'text',
+				data: oMyForm
+			});
+	    })
+	  .then(function(data, status) {
+		alert('upload応答=' + data);
+	    })
+	  .fail(function(jqXHR, status, errorThrown) {
+		alert('エラー発生 no_get=' + no_get + ':' + status + ',' + jqXHR.responseText);
+	    });
 }
 
 function selectSize(sizeIndex)

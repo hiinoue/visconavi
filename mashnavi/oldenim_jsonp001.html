@@ -48,10 +48,11 @@
     <button type="button" id="prev" onClick="prevPage()">前頁</button>
     <button type="button" id="next" onClick="nextPage()">次頁</button>
    </div>
-   <div class="c-both" />
+   <div class="c-both"></div>
    <div id="selectMisc">
     <table>
      <tbody>
+      <tr>
       <td id="simulation">
 	    <div id="selectParts">
 	     <div id="itemtab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
@@ -109,7 +110,14 @@
 		<div id="output"></div>
 		</section -->
 	    </div>
+	    <div>
+		<form id="upload-form" method="post" enctype="multipart/form-data">
+			<!-- textarea id="upload-filename" name="FileName" size="27">PN000011.xml</textarea -->
+			<!-- textarea id="upload-content" name="orderSend" size="27">del="yes"</textarea -->
+		</form>
+	    </div>
       </td>
+      </tr>
      </tbody>
     </table>
    </div>
