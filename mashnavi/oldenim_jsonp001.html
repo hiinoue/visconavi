@@ -2,7 +2,7 @@
 <html manifest="vasconavi.manifest">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width; initial-scale=1.0; user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <style type="text/css">
   h2 {float: left; background: -moz-linear-gradient(top, #FF9, #9C0)}
   #action button {margin-left: 10px;
@@ -30,6 +30,9 @@
   #back {background-color: white; height: 600px;}
   figure {border-radius: 5px; border-style: outset;} 
   #SizeData {display: none;}
+  #matashita {width: 200px; height: 20px; margin: 5px 0px 3px 8px;}
+  #matashita_min {width: 50px; height: 20px; border: 0;}
+  #matashita_max {width: 50px; height: 20px; border: 0;}
 
   .c-both {clear: both;}
 </style>
@@ -37,7 +40,9 @@
 <script src="js/BasketJ.js" language="javascript"></script>
 <script src="js/DisplayJsonMisc.js" language="javascript"></script>
 <script src="js/makeJsonArray.js" language="javascript"></script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
+<script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
 <script type="text/javascript" src="js/olddenim_jsonp001.js" language="javascript"></script>
 
 </head>
@@ -99,12 +104,27 @@
 		  <tbody>
 		   <tr id="sizelist">
 		   </tr>
-		  </tbody>
+		  <tbody>
 		</table>
 	   	<label>股下指定</label>
-		<select name="股下" id="matashita">
-		</select>
-		<!--section>
+		<table>
+		  <tbody>
+		    <tr>
+		      <td>
+	   		<textarea id="matashita_min" readonly>最短値</textarea>
+		      </td>
+		      <td>
+			<!-- select name="股下" id="matashita"></select -->
+			<div id="matashita"></div>
+		      </td>
+		      <td>
+	   		<textarea id="matashita_max" readonly>最長値</textarea>
+		      </td>
+		    </tr>
+		  </tbody>
+		</table>
+	        <div id="slidervalue"></div>
+		<!-- section>
 		<p>キャッシュ状況を表示します。</p>
 		<button onclick="applicationCache.update()">キャッシュを更新する</button>
 		<div id="output"></div>

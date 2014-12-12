@@ -117,18 +117,29 @@ function setSelected(tlist, curIndex, newIndex)
 		return -1;
 	if (newIndex != curIndex)
 	{
-		var trelem, tdlist, tdelem
+		var trdelem, tdlist;
 		for (i = 0, j = 0; i < tlist.children.length; i++)
 		{
-			trelem = tlist.children[i];
-			tdlist = trelem.getElementsByTagName('td');
-			for (k = 0; k < tdlist.length; k++, j++)
+			trdelem = tlist.children[i];
+			if (trdelem.tagName.toLowerCase() == 'td')
 			{
-				tdelem = tdlist[k];
 				if (j == curIndex)
-					tdelem.style.backgroundColor = 'transparent';
-				if (j == newIndex)
-					tdelem.style.backgroundColor = '#99FF00';
+					trdelem.style.backgroundColor = 'transparent';
+				else if (j == newIndex)
+					trdelem.style.backgroundColor = '#99FF00';
+				j++;
+			}
+			else
+			{
+				tdlist = trdelem.getElementsByTagName('td');
+				for (k = 0; k < tdlist.length; k++, j++)
+				{
+					trdelem = tdlist[k];
+					if (j == curIndex)
+						trdelem.style.backgroundColor = 'transparent';
+					else if (j == newIndex)
+						trdelem.style.backgroundColor = '#99FF00';
+				}
 			}
 		/**
 		if (curIndex >= 0)
@@ -153,7 +164,7 @@ function displayPartsList(ipartslist, partsarray)
 	if (optArrayCache != null &&
 	    curOptIndex >=0)
 		optObj = optArrayCache[curOptIndex];
-	var buttonFolder = parentTypeOf(basket.getColor())['-buttonFolder'];
+	var buttonFolder = 'catalog/PNP00Z/'; //// parentTypeOf(basket.getColor())['-buttonFolder'];
 	var selparts = basket.getSelectedParts(optObj['-code']);
 	var selindex = -1;
 	var partsObj;
@@ -227,7 +238,7 @@ function displayMatashitaList(imatashitalist)
 	if (imatashitalist == null)
 		return;
 	while (imatashitalist.children.length > 0) imatashitalist.removeChild(imatashitalist.children[0]);
-	if (matashitaList == null)
+	if (matashitaArray == null)
 	{
 		imatashitalist.style.visibility = 'hidden';
 		return;
@@ -236,22 +247,98 @@ function displayMatashitaList(imatashitalist)
 	if (selMatashita < 0)
 		selMatashita = matashitaDefault;
 	var selindex = -1;
-	for (var i = 0; i < matashitaList.length; i++)
+	for (var i = 0; i < matashitaArray.length; i++)
 	{
 		var optelem = document.createElement('option');
 		imatashitalist.appendChild(optelem);
-		optelem.value = matashitaList[i];
-		optelem.appendChild(document.createTextNode(matashitaList[i]));
+		optelem.value = matashitaArray[i];
+		optelem.appendChild(document.createTextNode(matashitaArray[i]));
 		optelem.setAttribute('onClick', 'chMatashita(this)');
-		if (selMatashita > 0 && matashitaList[i] == selMatashita)
+		if (selMatashita > 0 && matashitaArray[i] == selMatashita)
 			selindex = i;
 	}
-	// alert('matashitalist len=' + imatashitalist.children.length + ' selindex of ' + selMatashita + ' = ' + selindex);
+	// alert('matashitaArray len=' + imatashitalist.children.length + ' selindex of ' + selMatashita + ' = ' + selindex);
 	if (imatashitalist.children.length > 0)
 	{
 		imatashitalist.style.visibility = 'visible';
 		if (selindex >= 0)
 			imatashitalist.selectedIndex = selindex;
 	}
+}
+
+function displayMatashitaSlider(imatashitalist)
+{
+	if (imatashitalist == null)
+		return;
+	if (matashitaArray == null)
+	{
+		imatashitalist.style.visibility = 'hidden';
+		return;
+	}
+	imatashitalist.style.visibility = 'visible';
+	var selMatashita = basket.getMatashita();
+	if (selMatashita < 0)
+		selMatashita = matashitaDefault;
+	var selindex = -1;
+	var min_matashita = matashitaArray[0];
+	var max_matashita = matashitaArray[matashitaArray.length - 1];
+	var step_matashita = 0.5;
+	if (matashitaArray.Length > 1)
+		step_matashita = matashitaArray[1] - matashitaArray[0];
+
+	// alert('matashita min:' + min_matashita + ' max:' + max_matashita + ' step:' + step_matashita + ' value:' + selMatashita);
+	// jqeuryを使わない場合
+	var p = document.getElementById('matashita_min');
+	p.childNodes[0].nodeValue = min_matashita + 'cm';
+	// jqueryを使う場合は次のように書く
+	$('#matashita_max')[0].childNodes[0].nodeValue = max_matashita + 'cm';
+	$('#matashita').slider({
+			max: max_matashita, //最大値
+			min: min_matashita, //最小値
+			value: selMatashita, //初期値
+			step: step_matashita, //幅
+  			orientation: 'horizontal', //縦設置か横設置か
+ 
+			slide: function( event, ui ) {
+				basket.setMatashita(ui.value);
+				$('#slidervalue').html('slider：' + ui.value);
+			},
+			create: function( event, ui ) {
+				$('#slidervalue').html('create：' + $(this).slider('value'));
+				basket.setMatashita($(this).slider('value'));
+			},
+			start: function( event, ui ){
+				basket.setMatashita(ui.value);
+				$('#slidervalue').html('start：' + ui.value);
+			},
+			stop: function( event, ui ) {
+				basket.setMatashita(ui.value);
+				$('#slidervalue').html('stop：' + ui.value);
+			},
+			change: function( event, ui ) {
+				basket.setMatashita(ui.value);
+				$('#slidervalue').html('change：' + ui.value);
+			}
+	});
+/****
+ //ボタンを押したら値を100にする
+ $("#valueset").click(function(){
+  $("#slider").slider("value",100);
+ });
+});
+
+	for (var i = 0; i < matashitaArray.length; i++)
+	{
+		if (selMatashita > 0 && matashitaArray[i] == selMatashita)
+			selindex = i;
+	}
+	// alert('matashitaArray len=' + imatashitalist.children.length + ' selindex of ' + selMatashita + ' = ' + selindex);
+	if (imatashitalist.children.length > 0)
+	{
+		imatashitalist.style.visibility = 'visible';
+		if (selindex >= 0)
+			imatashitalist.selectedIndex = selindex;
+	}
+***/
 }
 -->

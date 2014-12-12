@@ -10,6 +10,12 @@ var json_root = null;
 function handle_json(jsondata)
 {
 	// alert('handle_json');
+	/**
+	alert('requestFileSystem=' + typeof(window.requestFileSystem)
+			+ ' webkitRequestFileSystem=' + typeof(window.webkitRequestFileSystem)
+			+ ' MozRequestFileSystem=' + typeof(window.MozRequestFileSystem)
+			+ ' MSRequestFileSystem=' + typeof(window.MSRequestFileSystem));
+	**/
 	json_root = jsondata;
 	if (json_root == undefined)
 	{
@@ -45,8 +51,81 @@ function handle_json(jsondata)
 	displayItemList(hlist_item, itemArrayCache);
 }
 
+//
+//	FileSystem APIを実装しているchromeでのダウンロードテスト
+//
+function fileSystemApiTest()
+{
+	var reqFileSystem = window.requestFileSystem || window.webkitRequestFileSystem
+				 || window.MozRequestFileSystem || window.MSRequestFileSystem;
+	var blobData;
+	if (typeof(reqFileSystem) != 'undefined')
+	{
+		var download_site = 'http://localhost/mashnavi/';
+				// 'http://www.ne.jp/asahi/inocchichichi/entrance/apps/';
+		var download_name = 'catalog/PNP11A/BSE010.jpg';
+		var download_file = download_site + download_name;
+		alert('download file=' + download_file);
+		var xhr = jQuery.ajaxSettings.xhr();
+		xhr.open('GET', download_file, true);
+		xhr.responseType = 'blob';
+		var tid = setTimeout(function () {
+				if (xhr.readyState != 4) {
+					// 完了していなければ打ち切る
+					xhr.abort();
+					// error(xhr, 0);
+				}
+			}, 15 * 1000);
+		xhr.onload = function () {
+			alert('success:download ' + download_file + ' status:' + this.status);
+			if (this.status == 200) {c
+				clearTimeout(tid);
+				blobData = this.response;
+				navigator.webkitPersistentStorage.requestQuota(blobData.size, function(bytes) {
+				  reqFileSystem(window.PERSISTENT, bytes, function(fs) {
+				    fs.root.getDirectory('catalog', {create: true, exclusive: false}, function(dirEntry) {
+				      dirEntry.getDirectory('PNP11B', {create: true, exclusive: false}, function(dirEntry) {
+					dirEntry.getFile('BSE010.jpg' /* download_name */, {create: true, exclusive: false}, function(fileEntry) {
+					  fileEntry.createWriter(function(fileWriter) {
+					    fileWriter.onwriteend = function(e) {
+						console.log('書き込み完了');
+					    };
+					    fileWriter.onerror = function(e) {
+						console.log('書き込みエラー: ' + e.toString());
+					    };
+					    fileWriter.write(blobData);
+					  });
+					}, function(e) {
+						console.log('getfile エラー:' + e.message);
+				        });
+				      }, function (e) {
+						console.log('getDirectory エラー:' + e.message);
+				      });
+				    }, function (e) {
+					console.log('getDirectory エラー:' + e.message);
+				    });
+				}, function(e) {
+					console.log('reqFileSystem エラー:' + e.message);
+				  });
+				});
+			}
+			else
+				error(this, this.status);
+		};
+		xhr.onerror = function () {
+alert('error:download ' + download_file);
+			error(this, this.status);
+		};
+		xhr.send();
+	}
+}
+
 function jsonp_connect()
 {
+	alert('jsonp_connect() browser=' + navigator.appName + ' agent=' + navigator.userAgent + ' version=' + navigator.appVersion);
+
+	fileSystemApiTest();
+
 	var local = true;
 	var via_script = true;
 	// alert('jsonp_connect local=' + local + ' via_script=' + via_script);
@@ -72,7 +151,7 @@ function jsonp_connect()
 			url: jsonfile, 
 			type: 'Get',
 			dataType: 'jsonp', 
-			error: function () {alert('ロード失敗');}, 
+			error: function () {alert('jsonpファイル ロード失敗');}, 
 			success: function(json_return)
 			{
 				handle_json(json_return);
@@ -127,7 +206,8 @@ function setItemNo(itemno)
 	}
 	sizeArrayCache = makeSizeArray(newItem);
 	displaySizeList(hlist_size, sizeArrayCache);
-	displayMatashitaList(hlist_matashita);
+	// displayMatashitaList(hlist_matashita);
+	displayMatashitaSlider(hlist_matashita);
 }
 
 function displayOptParts(newOptIndex)
@@ -201,7 +281,8 @@ function nextPage(event)
 		itemObj = basket.getItem();
 		sizeArrayCache = makeSizeArray(itemObj);
 		displaySizeList(hlist_size, sizeArrayCache);
-		displayMatashitaList(hlist_matashita);
+		// displayMatashitaList(hlist_matashita);
+		displayMatashitaSlider(hlist_matashita);
 		prev.style.display = 'inline';
 
 		var szdata = document.getElementById('SizeData');
@@ -217,64 +298,23 @@ function nextPage(event)
 	var use_gui_form = false; // true/false何れでもOK。blobを使用しておりそのためmultipart/form-dataが
 				  // 自然に設定されると思われる。
 	var upload_add = false;
-/***
-	var jqxhr;
-	if (no_get)
+	var use_bbuilder = false;
+	var canceled = false;
+	var BBuilder;
+	if (typeof(Blob) != typeof(Function))
 	{
-		jqxhr = $.ajax({
-			url: urlfile_noget,
-			type: 'get',
-			dataType: 'xml'
-		});
-	}
-	else
-	{
-		var para_data = ['<waiwa del="yes" /waiwa>'];
-		var oMyForm;
-		var oMyBlob = new Blob(para_data, {type : 'text/html'}); // the blob
-		if (use_gui_form)
+		BBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
+		if (typeof(BBuilder) == 'undefined')
 		{
-			$form = $('#upload-form');
-			//var text_content = document.getElementById('upload-content');
-			//alert('content=' + text_content.textContent);
-			//text_content.textContent = para_data;
-       			oMyForm = new FormData($form[0]);
+			if (typeof(Blob) == 'undefined')
+			{
+				alert('Blob未実装のため処理不可');
+				return;
+			}
 		}
 		else
-		{
-			oMyForm = new FormData();
-		}
-
-		if (upload_add)
-			oMyForm.append('FileName', orderno + '.xml');
-		oMyForm.append('orderData', oMyBlob);
-		if (upload_add)
-			oMyForm.append('Upload', 'Submit Query');
-		jqxhr = $.ajax({
-			url: urlfile,
-			type: 'post',
-			processData: false,
-			contentType: false, // falseでなければならない。
-					　　// このcontentTypenに直接 multipart/form-data; boundary=xxxxxxx
-					    // を設定しようとしても設定したboundary要素を利用してくれない。
-			// headers: {'Content-Type' : 'multipart/form-data; boundary=axbygd'}, // contentTypeと同様
-			dataType: 'text',
-			data: oMyForm
-		});
+			use_bbuilder = true;
 	}
-	jqxhr
-	  .done(function(data, status) {
-			if (no_get)
-			{
-				var order = data.getElementsByTagName('order');
-				alert('response=' + order[0].getAttribute('orderNumber'));
-			}
-			else
-				alert('response=' + data);
-		})
-	  .fail(function(jqXHR, status, errorThrown) {alert('エラー発生:' + status + ',' + jqXHR.responseText);
-		});
-	***/
 	no_get = true;	// 最初に№を取得する
 	$.ajax({
 		url: urlfile_noget,
@@ -284,12 +324,25 @@ function nextPage(event)
 	  .then(function(data, status) {
 		var order = data.getElementsByTagName('order');
 		var orderno = order[0].getAttribute('orderNumber');
-		alert('orderno=' + orderno);
+		if (!window.confirm('注文№は' + orderno + ' 注文しますか？'))
+		{
+			canceled = true;
+			return;
+		}
 
 		no_get = false;
 		var para_data = ['<waiwa del="yes" /waiwa>'];
 		var oMyForm;
-		var oMyBlob = new Blob(para_data, {type : 'text/html'}); // the blob
+		var oMyBlob;
+		if (use_bbuilder)
+		{
+			var BBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
+			var bb = new BBuilder();
+			bb.append(para_data);
+			oMyBlob = bb.getBlob('text/xml');
+		}
+		else
+			oMyBlob = new Blob(para_data, {type : 'text/xml'}); // the blob
 		if (use_gui_form)
 		{
 			$form = $('#upload-form');
@@ -300,7 +353,7 @@ function nextPage(event)
 
 		if (upload_add)
 			oMyForm.append('FileName', orderno + '.xml');
-		oMyForm.append('orderData', oMyBlob);
+		oMyForm.append('orderData', oMyBlob, orderno + '.xml');
 		if (upload_add)
 			oMyForm.append('Upload', 'Submit Query');
 		return $.ajax({
@@ -316,7 +369,8 @@ function nextPage(event)
 			});
 	    })
 	  .then(function(data, status) {
-		alert('upload応答=' + data);
+		if (!canceled)
+			alert('upload応答=' + data);
 	    })
 	  .fail(function(jqXHR, status, errorThrown) {
 		alert('エラー発生 no_get=' + no_get + ':' + status + ',' + jqXHR.responseText);
@@ -325,10 +379,10 @@ function nextPage(event)
 
 function selectSize(sizeIndex)
 {
-	//alert('size ' + sizeIndexSelected + ' -> ' + sizeIndex);
+	// alert('size ' + sizeIndexSelected + ' -> ' + sizeIndex);
 	basket.setSize(sizeIndex >= 0 ? sizeArrayCache[sizeIndex] : null);
 	sizeIndexSelected = setSelected(hlist_size, sizeIndexSelected, sizeIndex);
-	//alert('sizeInexSelected=' + sizeIndexSelected);
+	// alert('sizeInexSelected=' + sizeIndexSelected);
 }
 
 function chSize(node)

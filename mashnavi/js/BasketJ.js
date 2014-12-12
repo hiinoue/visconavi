@@ -147,20 +147,34 @@ var Basket = function() {
 			avatarb = layer['-avatar_b'];
 			layobj.avatar_b = avatarb;
 			silarray.push(layobj);
-			if (avatarf != '')
+			if (avatarf != null && avatarf != '')
 			{
 				layobj.fimage = nimage = new Image();
+				nimage.crossOrigin = 'anonymous';
+				nimage.silfile = avatarf;
 				nimage.onload = function() {
 					//alert('silhouette front loaded');
 					redraw(true);
 				}
+				nimage.onerror = function() {
+					layobj.fimage = null;
+					console.log('silhouette image load error:' + this.silfile);
+					redraw(true);
+				}
 				nimage.src = avatarf;
 			}
-			if (avatarb != '')
+			if (avatarb != null && avatarb != '')
 			{
 				layobj.bimage = nimage = new Image();
+				nimage.crossOrigin = 'anonymous';
+				nimage.silfile = avatarb;
 				nimage.onload = function() {
 					//alert('silhouette back loaded')
+					redraw(true);
+				}
+				nimage.onerror = function() {
+					layobj.bimage = null;
+					console.log('silhouette image load error:' + this.silfile);
 					redraw(true);
 				}
 				nimage.src = avatarb;
@@ -204,17 +218,47 @@ var Basket = function() {
 		// ベースImageオブジェクトを生成
 		if (curColor != null)
 		{
-			base.fimage = new Image();
-			base.bimage = new Image();
-			base.fimage.onload = base.bimage.onload = function() {
-				//alert('base loaded');
-				redraw(true);
+			var color_f = curColor['-avatar_f'];
+			var color_b = curColor['-avatar_b'];
+			var fimg = null, bimg = null;
+			if (color_f != null && color_f != '')
+			{
+				fimg = base.fimage = new Image();
+				fimg.crossOrigin = 'anonymous';
+				fimg.colfile = color_f;
+				fimg.onload = function() {
+					console.log('front base image loaded:' + this.colfile);
+					redraw(true);
+				}
+				fimg.onerror = function() {
+					base.fimage = null;
+					console.log('base image load error:' + this.colfile);
+					redraw(true);
+				}
+				fimg.src = color_f;
 			}
-			base.fimage.src = curColor['-avatar_f'];
-			base.bimage.src = curColor['-avatar_b'];
+			if (color_b != null && color_b != '')
+			{
+				bimg = base.bimage = new Image();
+				bimg.crossOrigin = 'anonymous';
+				bimg.colfile = color_b;
+				bimg.onload = function() {
+					console.log('back base image loaded:' + this.colfile);
+					redraw(true);
+				}
+				bimg.onerror = function() {
+					base.bimage = null;
+					console.log('base image load error:' + this.colfile);
+					redraw(true);
+				}
+				bimg.src = color_b;
+			}
+
 			if (onload_skipable &&
-			    base.fimage.complete &&
-			    base.bimage.complete)
+			    (fimg == null ||
+			     fimg.complete) &&
+			    (bimg == null ||
+			     bimg.complete))
 				redraw(false);
 		}
 	}
@@ -249,7 +293,8 @@ var Basket = function() {
 			{
 				img = layobj.fimage;
 				if (img == null ||
-			    	    !img.complete)
+			    	    !img.complete ||
+				    img.width <= 0)
 				{
 					//alert('parts front pending ' + layobj.front);
 					draw_pending = true;
@@ -260,7 +305,8 @@ var Basket = function() {
 			{
 				img = layobj.bimage;
 				if (img == null ||
-			    	    !img.complete)
+			    	    !img.complete ||
+				    img.width <= 0)
 				{
 					//alert('parts back pending ' + layobj.back);
 					draw_pending = true;
@@ -358,6 +404,7 @@ var Basket = function() {
 			if (imgwdt <= 0 ||
 			    imghgt <= 0)
 			{
+				baseimg = null;
 				if (silarray.length > 0)
 				{
 					for (i = 0; i < silarray.length; i++)
@@ -422,9 +469,10 @@ var Basket = function() {
 				for (var i = 0; i < partsarray.length; i++)
 				{
 					layobj = partsarray[i];
+					var layimg = layobj[imgname];
 					if (layobj.partsCode != null &&
-			       		    layobj[imgname] != null)
-    						offctx.drawImage(layobj[imgname], 0, 0);
+			       		    layimg != null)
+    						offctx.drawImage(layimg, 0, 0);
 				}
 //alert(' !! 3');
 				basedt = offctx.getImageData(0, 0, imgwdt, imghgt);
@@ -449,7 +497,8 @@ var Basket = function() {
 					continue;
 // alert(' !! 4-imgname=' + imgname);
 				img = layobj[imgname];
-				if (img == null)
+				if (img == null ||
+				    !img.complete)
 					continue;
 				imgdt = layobj[idtname];
 				/***
@@ -683,11 +732,38 @@ var Basket = function() {
 		curMatashita = len;
 	}
 
+	function defaultPartsFileLoad(layobj, partsFile, foreground)
+	{
+		var repstr = partsFile.replace(/\/PNP\d\d/, '/PNP00');
+		if (repstr == partsFile)
+			return null;
+		nimage = new Image();
+		nimage.crossOrigin = 'anonymous';
+		if (foreground)
+			layobj.fimage = nimage;
+		else
+			layobj.bimage = nimage;
+		nimage.partsfile = partsFile;
+		nimage.onload = function() {
+			redraw(true);
+		}
+		nimage.onerror = function() {
+			if (foreground)
+				layobj.fimage = null;
+			else
+				layobj.bimage = null;
+			console.log('parts image reload error:' + this.partsfile);
+			redraw(true);
+		}
+		nimage.src = repstr;
+		return repstr;
+	}
+
 	function selectParts(opt, code, mode)
 	{	
 		var i;
 		var layobj = null;
-		for (i = 0; i <partsarray.length; i++)
+		for (i = 0; i < partsarray.length; i++)
 		{
 			if (partsarray[i].opt == opt)
 			{
@@ -700,6 +776,9 @@ var Basket = function() {
 		var layer = layobj.optobj;
 		if (layer == null)
 			return -1;
+
+		if (code == null)
+			code = layer['-force'];
 		if (code == null)
 		{
 			if (layobj.partsCode != null)
@@ -719,6 +798,8 @@ var Basket = function() {
 			return -1;
 		}
 		var local_partsarray = layer.parts;
+		if (!Array.isArray(local_partsarray))
+			local_partsarray = [layer.parts];
 		var pasrtobj;
 		var partsFolder = curType['-partsFolder'];
 		for (i = 0; i < local_partsarray.length; i++)
@@ -735,37 +816,54 @@ var Basket = function() {
 	
 					return selectParts(opt, resetval, 'immediate');
 				}
+				layobj.fimage = layobj.bimage = null;
 				layobj.partsCode = code;
 				layobj.front = partsobj['-front'];
 				if (layobj.front != null &&
 			    	    layobj.front != '')
 				{
 					nimage = new Image();
+					nimage.crossOrigin = 'anonymous';
+					var partsFile = partsFolder + layobj.front;
 					layobj.fimage = nimage;
+					nimage.partsfile = partsFile;
 					nimage.onload = function() {
 						redraw(true);
 					}
-					nimage.src = partsFolder + layobj.front;
+					nimage.onerror = function() {
+						layobj.fimage = null;
+						// console.log('parts image load error:' + this.partsfile);
+						if (defaultPartsFileLoad(layobj, partsFile, true) == null)
+							redraw(true);
+					}
+					nimage.src = partsFile;
 					if (onload_skipable && nimage.complete)
 						immediateDraw = true;
 				}
-				else
-					layobj.fimage = null;
+
 				layobj.back = partsobj['-back'];
 				if (layobj.back != null &&
 			    	    layobj.back != '')
 				{
 					nimage = new Image();
+					nimage.crossOrigin = 'anonymous';
+					var partsFile = partsFolder + layobj.back;
 					layobj.bimage = nimage;
+					nimage.partsfile = partsFile;
 					nimage.onload = function() {
 						redraw(true);
 					}
-					nimage.src = partsFolder + layobj.back;
+					nimage.onerror = function() {
+						layobj.bimage = null;
+						// console.log('parts image load error:' + this.partsfile);
+						if (defaultPartsFileLoad(layobj, partsFile, false) == null)
+							redraw(true);
+					}
+					nimage.src = partsFile;
 					if (onload_skipable && nimage.complete)
 						immediateDraw = true;
 				}
-				else
-					layobj.bimage = null;
+
 				switch (mode)
 				{
 					case 'immediate':

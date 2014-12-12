@@ -6,7 +6,7 @@ var itemArrayCache = null;	// Array of item objects
 var typeArrayCache = null;	// Array of type objects corresponding to colorArrayCache
 var colorArrayCache = null;	// Array of color objects
 var sizeArrayCache = null;	// Array of size objects
-var matashitaList = null;	// Array of matashita length
+var matashitaArray = null;	// Array of matashita length
 var matashitaDefault = -1;
 var optArrayCache = null;	// Array of option objects
 var curOptIndex = -1;
@@ -82,7 +82,7 @@ function makeOptArrayFromTemplate(jsondata, templateId)
 
 	var optslist = getTemplateCollection(jsondata).PartsTemplate;
 	var optemp = null;
-	if (Array.isArray(optlist))
+	if (Array.isArray(optslist))
 	{
 		for (var i = 0; i < optslist.length; i++)
 		{
@@ -113,14 +113,18 @@ function makePartsArray(optarray, optindex)
 		return partsArrayCache;
 	var optObj = optarray[optindex];
 	curOptIndex = optindex;
-	return optObj.parts;
+	if (Array.isArray(optObj.parts))
+		return optObj.parts;
+	return [optObj.parts];
 }
 
 function makeSizeArray(itemObj)
 {
 	// alert('displayartsList cur=' + curOptIndex + ' => ' + optIndex);
-	matashitaList = null;
+	matashitaArray = null;
 	matshitaDefault = -1;
+	if (itemObj == null)
+		return;
 	var templateId = itemObj['-sizeTemplate'];
 	//alert('templateId=' + templateId);
 	var sizetemp = null;
@@ -153,7 +157,7 @@ function makeSizeArray(itemObj)
 	var lengthMin = sizetemp['-lengthMin'];
 	if (lengthMin != null)
 	{
-		matashitaList = [];
+		matashitaArray = [];
 		var lengthMax = sizetemp['-lengthMax'];
 		var lengthStep = sizetemp['-lengthStep'];
 		var lengthInit = sizetemp['-lengthInit'];
@@ -164,9 +168,9 @@ function makeSizeArray(itemObj)
 			lengthStep = 1;
 		for (var i = Number(lengthMin); i <= Number(lengthMax); i += Number(lengthStep))
 		{
-			matashitaList.push(i);
+			matashitaArray.push(i);
 		}
-		//alert('matashitaList len=' + matashitaList.length);
+		//alert('matashitaArray len=' + matashitaArray.length);
 	}
 	return sizetemp.Size;
 }
