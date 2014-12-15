@@ -187,9 +187,9 @@ Basket.prototype.redraw = function(ifPending) {
 	// alert('redraw'); 
 	if (this.curColor != null &&
 	    (!this.base.fimage ||
-    	     !this.base.fimage.complete ||
+    	     this.base.fimage.width <= 0 ||
     	     !this.base.bimage ||
-    	     !this.base.bimage.complete))
+    	     this.base.bimage.width <= 0))
 	{
 		//alert('base pending');
 		this.draw_pending = true;
@@ -205,8 +205,7 @@ Basket.prototype.redraw = function(ifPending) {
 		{
 			img = layobj.fimage;
 			if (img == null ||
-		    	    !img.complete ||
-			    img.width <= 0)
+		    	    img.width <= 0)
 			{
 				//alert('parts front pending ' + layobj.front);
 				this.draw_pending = true;
@@ -217,8 +216,7 @@ Basket.prototype.redraw = function(ifPending) {
 		{
 			img = layobj.bimage;
 			if (img == null ||
-		    	    !img.complete ||
-			    img.width <= 0)
+		    	    img.width <= 0)
 			{
 				//alert('parts back pending ' + layobj.back);
 				this.draw_pending = true;
@@ -233,7 +231,7 @@ Basket.prototype.redraw = function(ifPending) {
 		{
 			img = layobj.fimage;
 			if (img == null ||
-		    	    !img.complete)
+		    	    img.width <= 0)
 			{
 				//alert('silhouette front pending ' + layobj.avatar_f);
 				this.draw_pending = true;
@@ -244,7 +242,7 @@ Basket.prototype.redraw = function(ifPending) {
 		{
 			img = layobj.bimage;
 			if (img == null ||
-		    	    !img.complete)
+		    	    img.width <= 0)
 			{
 				//alert('silhouette back pending ' + layobj.avatar_b);
 				this.draw_pending = true;
@@ -407,7 +405,7 @@ Basket.prototype.redraw = function(ifPending) {
 // alert(' !! 4-imgname=' + imgname);
 			img = layobj[imgname];
 			if (img == null ||
-			    !img.complete)
+			    img.width <= 0)
 				continue;
 			imgdt = layobj[idtname];
 			/***
@@ -799,7 +797,7 @@ function selectParts(pbasket, opt, code, mode)
 						pbasket.redraw(true);
 				}
 				nimage.src = partsFile;
-				if (Basket.onload_skipable && nimage.complete)
+				if (Basket.onload_skipable && nimage.width > 0)
 					immediateDraw = true;
 			}
 
@@ -823,7 +821,7 @@ function selectParts(pbasket, opt, code, mode)
 						pbasket.redraw(true);
 				}
 				nimage.src = partsFile;
-				if (Basket.onload_skipable && nimage.complete)
+				if (Basket.onload_skipable && nimage.width > 0)
 					immediateDraw = true;
 			}
 
@@ -913,9 +911,9 @@ function dress(pbasket) {
 
 		if (Basket.onload_skipable &&
 		    (fimg == null ||
-		     fimg.complete) &&
+		     fimg.width > 0) &&
 		    (bimg == null ||
-		     bimg.complete))
+		     bimg.width > 0))
 			pbasket.redraw(false);
 	}
 }
