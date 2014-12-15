@@ -1,105 +1,126 @@
 <!--
 // Basket.js
-var Basket = function() {
+var Basket = function Basket(jsondata) {
+	// 現在の選択内容
+	this.curItem = null; // Item object
+	this.curType = null; // Type object
+	this.curColor = null; // detail object
+	this.partsarray = []; // Array of parts object
+	this.curSize = null; // size object
+	this.curMatashita = -1;
+	this.silarray = [];
+
+	this.curSilhouetteTemplate = null; // String
+	this.curDesignTemplate = null; // String
+	this.curFullDesignTemplate = null; // String
+	this.curPartsTemplate = null; // String
+	this.curSizeTemplate = null; // String
+
 	const onload_skipable = false;
-	var canvas_front = null;
-	var context_front = null;
-	var spec_front_width = -1;
-	var spec_front_height = -1;
-	var canvas_back = null;
-	var context_back = null;
-	var spec_back_width = -1;
-	var spec_back_height = -1;
-	var offimage = null;
-	var offctx = null;
+	this.canvas_front = null;
+	this.context_front = null;
+	this.spec_front_width = -1;
+	this.spec_front_height = -1;
+	this.canvas_back = null;
+	this.context_back = null;
+	this.spec_back_width = -1;
+	this.spec_back_height = -1;
+	this.offimage = null;
+	this.offctx = null;
 
-	this.jsonroot = null;
-	var curSilhouetteTemplate = null; // String
-	var curDesignTemplate = null; // String
-	var curFullDesignTemplate = null; // String
-	var curPartsTemplate = null; // String
-	var curSizeTemplate = null; // String
+	this.draw_pending = false;
+	this.base = {};	// ベース images
 
-	var curItem = null; // Item object
-	var curType = null; // Type object
-	var curColor = null; // detail object
-	var curSize = null; // size object
-	var curMatashita = -1;
-
-	var now_drawing = false;
-	var draw_pending = false;
-	var base = {};	// ベース images
-	var partsarray = []; // Array of parts object
-	var silarray = [];
+	this.jscache = null;
+	this.jsonroot = jsondata;
+	if (jsondata != null)
+		this.jscache = new NaviCacheHolder(jsondata);
 
 	this.set_canvas_front = function(canvas, context) {
-		canvas_front = canvas;
-		context_front = context;
-		if (spec_front_width < 0)
+		this.canvas_front = canvas;
+		this.context_front = context;
+		if (this.spec_front_width < 0)
 		{
-			spec_front_width = canvas.width;
-			spec_front_height = canvas.height;
+			this.spec_front_width = canvas.width;
+			this.spec_front_height = canvas.height;
 		}
 	}
 	this.get_canvas_front = function() {
-		return canvas_front;
+		return this.canvas_front;
 	}
 	this.set_canvas_back = function(canvas, context) {
-		canvas_back = canvas;
-		context_back = context;
-		if (spec_back_width < 0)
+		this.canvas_back = canvas;
+		this.context_back = context;
+		if (this.spec_back_width < 0)
 		{
-			spec_back_width = canvas.width;
-			spec_back_height = canvas.height;
+			this.spec_back_width = canvas.width;
+			this.spec_back_height = canvas.height;
 		}
 	}
 	this.get_canvas_back = function() {
-		return canvas_back;
+		return this.canvas_back;
 	}
 	this.set_offimage = function(canvas, context) {
-		offimage = canvas;
-		offctx = context;
+		this.offimage = canvas;
+		this.offctx = context;
 	}
 	this.get_offimage = function() {
-		return offimage;
+		return this.offimage;
 	}
 
 	this.getSilhouetteTemplate = function() {
-		return curSilhouetteTemplate;
+		return this.curSilhouetteTemplate;
 	}
 	this.getDesignTemplate = function() {
-		return curDesignTemplate;
+		return this.curDesignTemplate;
 	}
 	this.getSizeTemplate = function() {
-		return curSizeTemplate;
+		return this.curSizeTemplate;
 	}
 	this.getFullDesignTemplate = function() {
-		return curFullDesignTemplate;
+		return this.curFullDesignTemplate;
 	}
 
 	this.getItem = function() {
-		return curItem;
+		return this.curItem;
 	}
 	this.getColor = function() {
-		return curColor;
+		return this.curColor;
 	}
 
 	this.getSize = function() {
-		return curSize;
+		return this.curSize;
 	}
 
 	this.getMatashita = function() {
-		return curMatashita;
+		return this.curMatashita;
+	}
+
+	this.setItemNo = function(itemno) {
+		return this.jscache.setItemNo(this, itemno);
+	}
+
+	this.getItemCache = function() {
+		return this.jscache.itemArrayCache;
+	}
+	this.getColorCache = function() {
+		return this.jscache.colorArrayCache;
+	}
+	this.getOptCache = function() {
+		return this.jscache.optArrayCache;
+	}
+	this.getSizeCache = function() {
+		return this.jscache.sizeArrayCache;
 	}
 
 	this.getSelectedParts = function(opt) {
-		if (partsarray == null)
+		if (this.partsarray == null)
 			return null;
 		var partsobj;
 		var rcode = null;
-		for (var i = 0; i < partsarray.length; i++)
+		for (var i = 0; i < this.partsarray.length; i++)
 		{
-			partsobj = partsarray[i];
+			partsobj = this.partsarray[i];
 			if (partsobj.opt == opt)
 			{
 				if (partsobj.partsCode != null)
@@ -110,19 +131,19 @@ var Basket = function() {
 		return rcode;
 	}
 
-	function makeSilhouetteImagesFromTemplate(jsondata, templateId)
+	function makeSilhouetteImagesFromTemplate(pbasket, jscache, templateId)
 	{
-		if (templateId == curSilhouetteTemplate)
+		if (templateId == pbasket.curSilhouetteTemplate)
 			return;
-		curSilhouetteTemplate = templateId;
-		if (!curSilhouetteTemplate)
+		pbasket.curSilhouetteTemplate = templateId;
+		if (!pbasket.curSilhouetteTemplate)
 		{
 			silarray = [];
 			return;
 		}
 
 		var silhouette; 
-		var sillist = getTemplateCollection(jsondata).SilhouetteTemplate;
+		var sillist = jscache.getTemplateCollection().SilhouetteTemplate;
 		for (i = 0; i < sillist.length; i++)
 		{
 			if (sillist[i]['-id'] == templateId)
@@ -153,13 +174,13 @@ var Basket = function() {
 				nimage.crossOrigin = 'anonymous';
 				nimage.silfile = avatarf;
 				nimage.onload = function() {
-					//alert('silhouette front loaded');
-					redraw(true);
+					console.log('silhouette front image loaded:' + this.silfile);
+					pbasket.redraw(true);
 				}
 				nimage.onerror = function() {
 					layobj.fimage = null;
 					console.log('silhouette image load error:' + this.silfile);
-					redraw(true);
+					pbasket.redraw(true);
 				}
 				nimage.src = avatarf;
 			}
@@ -169,13 +190,13 @@ var Basket = function() {
 				nimage.crossOrigin = 'anonymous';
 				nimage.silfile = avatarb;
 				nimage.onload = function() {
-					//alert('silhouette back loaded')
-					redraw(true);
+					console.log('silhouette back image loaded:' + this.silfile)
+					pbasket.redraw(true);
 				}
 				nimage.onerror = function() {
 					layobj.bimage = null;
 					console.log('silhouette image load error:' + this.silfile);
-					redraw(true);
+					pbasket.redraw(true);
 				}
 				nimage.src = avatarb;
 			}
@@ -184,14 +205,14 @@ var Basket = function() {
 
 	this.makePartsArray = function(optarray, partsTemplate)
 	{
-		partsarray = [];
+		this.partsarray = [];
 		if (optarray == null ||
 		    optarray.length == 0)
 		{
-			curPartsTemplate = null;
+			this.curPartsTemplate = null;
 			return;
 		}
-		curPartsTemplate = partsTemplate;
+		this.curPartsTemplate = partsTemplate;
 		var layobj;
 		var selpart;
 		var nimage;
@@ -204,52 +225,52 @@ var Basket = function() {
 			layobj.optobj = layer;
 			layobj.name = layer['-name'];
 			layobj.dress = layer['-dress'];
-			partsarray.push(layobj);
+			this.partsarray.push(layobj);
 			selpart = layer['-force'];
 			if (selpart == null)
 				selpart = layer['-default'];
-			selectParts(layobj.opt, selpart, '');
+			selectParts(this, layobj.opt, selpart, '');
 		}
 	}
 
-	function dress() {
-		base.fimage = base.bimage = null;
+	function dress(pbasket) {
+		pbasket.base.fimage = pbasket.base.bimage = null;
 
 		// ベースImageオブジェクトを生成
-		if (curColor != null)
+		if (pbasket.curColor != null)
 		{
-			var color_f = curColor['-avatar_f'];
-			var color_b = curColor['-avatar_b'];
+			var color_f = pbasket.curColor['-avatar_f'];
+			var color_b = pbasket.curColor['-avatar_b'];
 			var fimg = null, bimg = null;
 			if (color_f != null && color_f != '')
 			{
-				fimg = base.fimage = new Image();
+				fimg = pbasket.base.fimage = new Image();
 				fimg.crossOrigin = 'anonymous';
 				fimg.colfile = color_f;
 				fimg.onload = function() {
 					console.log('front base image loaded:' + this.colfile);
-					redraw(true);
+					pbasket.redraw(true);
 				}
 				fimg.onerror = function() {
-					base.fimage = null;
+					pbasket.base.fimage = null;
 					console.log('base image load error:' + this.colfile);
-					redraw(true);
+					pbasket.redraw(true);
 				}
 				fimg.src = color_f;
 			}
 			if (color_b != null && color_b != '')
 			{
-				bimg = base.bimage = new Image();
+				bimg = pbasket.base.bimage = new Image();
 				bimg.crossOrigin = 'anonymous';
 				bimg.colfile = color_b;
 				bimg.onload = function() {
 					console.log('back base image loaded:' + this.colfile);
-					redraw(true);
+					pbasket.redraw(true);
 				}
 				bimg.onerror = function() {
-					base.bimage = null;
+					pbasket.base.bimage = null;
 					console.log('base image load error:' + this.colfile);
-					redraw(true);
+					pbasket.redraw(true);
 				}
 				bimg.src = color_b;
 			}
@@ -259,36 +280,35 @@ var Basket = function() {
 			     fimg.complete) &&
 			    (bimg == null ||
 			     bimg.complete))
-				redraw(false);
+				pbasket.redraw(false);
 		}
 	}
 
-	function redraw(ifPending) {
-		// if (now_drawing) return;
-		if (ifPending && !draw_pending)
+	this.redraw = function(ifPending) {
+		if (ifPending && !this.draw_pending)
 			return;
-		//alert('canvas_back=' + canvas_back + ' ' + context_back);
-		if (canvas_front == null)
+		//alert('canvas_back=' + this.canvas_back + ' ' + this.context_back);
+		if (this.canvas_front == null)
 			alert('canvas_front is null');
-		if (context_front == null)
+		if (this.context_front == null)
 			alert('context_front is null');
 		// alert('redraw'); 
-		if (curColor != null &&
-		    (!base.fimage ||
-	    	     !base.fimage.complete ||
-	    	     !base.bimage ||
-	    	     !base.bimage.complete))
+		if (this.curColor != null &&
+		    (!this.base.fimage ||
+	    	     !this.base.fimage.complete ||
+	    	     !this.base.bimage ||
+	    	     !this.base.bimage.complete))
 		{
 			//alert('base pending');
-			draw_pending = true;
+			this.draw_pending = true;
 			return;
 		}
 		var i;
 		var layobj;
 		var img;
-		for (i = 0; i < partsarray.length; i++)
+		for (i = 0; i < this.partsarray.length; i++)
 		{
-			layobj = partsarray[i];
+			layobj = this.partsarray[i];
 			if (layobj.front != null && layobj.front != '')
 			{
 				img = layobj.fimage;
@@ -297,7 +317,7 @@ var Basket = function() {
 				    img.width <= 0)
 				{
 					//alert('parts front pending ' + layobj.front);
-					draw_pending = true;
+					this.draw_pending = true;
 					return;
 				}
 			}
@@ -309,7 +329,7 @@ var Basket = function() {
 				    img.width <= 0)
 				{
 					//alert('parts back pending ' + layobj.back);
-					draw_pending = true;
+					this.draw_pending = true;
 					return;
 				}
 			}
@@ -324,7 +344,7 @@ var Basket = function() {
 			    	    !img.complete)
 				{
 					//alert('silhouette front pending ' + layobj.avatar_f);
-					draw_pending = true;
+					this.draw_pending = true;
 					return;
 				}
 			}
@@ -335,23 +355,22 @@ var Basket = function() {
 			    	    !img.complete)
 				{
 					//alert('silhouette back pending ' + layobj.avatar_b);
-					draw_pending = true;
+					this.draw_pending = true;
 					return;
 				}
 			}
 		}
 		//alert('now drawing');
-		//now_drawing = true;
-		draw_pending = false;
+		this.draw_pending = false;
 		// alert('operation');
 
-		var curop = offctx.globalCompositeOperation;
+		var curop = this.offctx.globalCompositeOperation;
 		try
 		{
-			if (canvas_front != null)
-				makeImage(canvas_front, 0, 0, context_front, 'f', 2);
-			if (canvas_back != null)
-				makeImage(canvas_back, 0, 0, context_back, 'b', 1);
+			if (this.canvas_front != null)
+				makeImage(this, this.canvas_front, 0, 0, this.context_front, 'f', 2);
+			if (this.canvas_back != null)
+				makeImage(this, this.canvas_back, 0, 0, this.context_back, 'b', 1);
 		}
 		catch (e)
 		{
@@ -368,10 +387,9 @@ var Basket = function() {
 					break;
 			} 
 		}
-		offctx.globalCompositeOperation = curop;
-		//now_drawing = false;
+		this.offctx.globalCompositeOperation = curop;
 
-		function makeImage(canvas, posx, posy, context, forb, whiteBoundary)
+		function makeImage(pbasket, canvas, posx, posy, context, forb, whiteBoundary)
 		{
 			var basedt = null;
 			var imgname = forb + 'image';
@@ -379,7 +397,7 @@ var Basket = function() {
 			var idtname = forb + 'imgdt';
 			var imgwdt = -1, imghgt = -1;
 
-			offctx.globalCompositeOperation = 'source-over';
+			pbasket.offctx.globalCompositeOperation = 'source-over';
 
 //alert(' !! 1');
 			var spec_width;
@@ -387,15 +405,15 @@ var Basket = function() {
 			switch (forb)
 			{
 				case 'b':
-					spec_width = spec_back_width;
-					spec_height = spec_back_height;
+					spec_width = pbasket.spec_back_width;
+					spec_height = pbasket.spec_back_height;
 					break;
 				default:
-					spec_width = spec_front_width;
-					spec_height = spec_front_height;
+					spec_width = pbasket.spec_front_width;
+					spec_height = pbasket.spec_front_height;
 					break;
 			}
-			var baseimg = base[imgname];
+			var baseimg = pbasket.base[imgname];
 			if (baseimg != null)
 			{
 				imgwdt = baseimg.width;
@@ -429,16 +447,16 @@ var Basket = function() {
 			}
 
 			var use_offline = false;
-			if (partsarray.length > 0 ||
+			if (pbasket.partsarray.length > 0 ||
 			    silarray.length > 0)
 				use_offline = true;
-			// alert('makeImage(' + baseimg.width + ',' + baseimg.height + ') parts=' + partsarray.length + ' sil=' + silarray.length);
+			// alert('makeImage(' + baseimg.width + ',' + baseimg.height + ') parts=' + pbasket.partsarray.length + ' sil=' + silarray.length);
 			if (use_offline)
 			{
 				// canvas.width = 
-				offimage.width = imgwdt;
+				pbasket.offimage.width = imgwdt;
 				// canvas.height =
-				offimage.height = imghgt;
+				pbasket.offimage.height = imghgt;
 			}
 
 			var tgt_width = imgwdt;
@@ -459,24 +477,24 @@ var Basket = function() {
 			if (use_offline)
 			{
 				if (baseimg != null)	
-     					offctx.drawImage(baseimg, 0, 0);
+     					pbasket.offctx.drawImage(baseimg, 0, 0);
 				else
 				{
-					offctx.fillStyle = 'rgb(255, 255, 255)';
-					offctx.fillRect(0, 0, imgwdt, imghgt);
+					pbasket.offctx.fillStyle = 'rgb(255, 255, 255)';
+					pbasket.offctx.fillRect(0, 0, imgwdt, imghgt);
 				}
 //alert(' !! 2');
-				for (var i = 0; i < partsarray.length; i++)
+				for (var i = 0; i < pbasket.partsarray.length; i++)
 				{
-					layobj = partsarray[i];
+					layobj = pbasket.partsarray[i];
 					var layimg = layobj[imgname];
 					if (layobj.partsCode != null &&
 			       		    layimg != null)
-    						offctx.drawImage(layimg, 0, 0);
+    						pbasket.offctx.drawImage(layimg, 0, 0);
 				}
 //alert(' !! 3');
-				basedt = offctx.getImageData(0, 0, imgwdt, imghgt);
-				offctx.globalCompositeOperation = 'copy';
+				basedt = pbasket.offctx.getImageData(0, 0, imgwdt, imghgt);
+				pbasket.offctx.globalCompositeOperation = 'copy';
 			}
 			else if (baseimg != null)
 			{
@@ -516,8 +534,8 @@ var Basket = function() {
 					case 'multiply':
 						if (imgdt == null)
 						{
-		    					offctx.drawImage(img, 0, 0);
-		    					imgdt = offctx.getImageData(0, 0, imgwdt, imghgt);
+		    					pbasket.offctx.drawImage(img, 0, 0);
+		    					imgdt = pbasket.offctx.getImageData(0, 0, imgwdt, imghgt);
 							layobj[idtname] = imgdt;
 						}
 						for (var j = 0; j < 4 * pic; j++)
@@ -529,8 +547,8 @@ var Basket = function() {
 					case 'add':
 						if (imgdt == null)
 						{
-	    						offctx.drawImage(img, 0, 0);
-	    						imgdt = offctx.getImageData(0, 0, imgwdt, imghgt);
+	    						pbasket.offctx.drawImage(img, 0, 0);
+	    						imgdt = pbasket.offctx.getImageData(0, 0, imgwdt, imghgt);
 							layobj[idtname] = imgdt;
 						}
 						for (var j = 0; j < 4 * pic; j++)
@@ -542,8 +560,8 @@ var Basket = function() {
 					case '%mask':
 						if (imgdt == null)
 						{
-	    						offctx.drawImage(img, 0, 0);
-	    						imgdt = offctx.getImageData(0, 0, imgwdt, imghgt);
+	    						pbasket.offctx.drawImage(img, 0, 0);
+	    						imgdt = pbasket.offctx.getImageData(0, 0, imgwdt, imghgt);
 							layobj[idtname] = imgdt;
 						}
 						for (var j = 0; j < pic; j++)
@@ -553,8 +571,8 @@ var Basket = function() {
 						/*** backdtはうまく利用することが出来ない
 						//if (backdt == undefined)
 						{
-	     					offctx.drawImage(backimg, 0, 0);
-   							backdt = offctx.getImageData(0, 0, backimg.width, backimg.height);
+	     						pbasket.offctx.drawImage(backimg, 0, 0);
+   							backdt = pbasket.offctx.getImageData(0, 0, backimg.width, backimg.height);
 						}
 						***/
 						if (basedt != null)
@@ -588,19 +606,19 @@ var Basket = function() {
 		}
 	}
 
-	function refreshParts()
+	function refreshParts(pbasket)
 	{
 		var layobj;
-		for (var i = 0; i < partsarray.length; i++)
+		for (var i = 0; i < pbasket.partsarray.length; i++)
 		{
-			layobj = partsarray[i];
-			selectParts(layobj.opt, layobj.partsCode, '');
+			layobj = pbasket.partsarray[i];
+			selectParts(pbasket, layobj.opt, layobj.partsCode, '');
 		}
 	}
 
 	this.setItem = function(item)
 	{
-		if (item == curItem)
+		if (item == this.curItem)
 			return;
 		var clear_color = false;
 		var refresh_color = false;
@@ -617,33 +635,33 @@ var Basket = function() {
 		var fulldesigntemp = designtemp ? designtemp + sub : null;
 
 		if (designtemp == null ||
-	    	    designtemp != curDesignTemplate)
+	    	    designtemp != this.curDesignTemplate)
 			clear_color = dirty = true;
-		else if (fulldesigntemp != curFullDesignTemplate)
+		else if (fulldesigntemp != this.curFullDesignTemplate)
 			refresh_color = refresh_parts = true;
-		if (siltemp != curSilhouetteTemplate)
+		if (siltemp != this.curSilhouetteTemplate)
 			dirty = true;
-		if (partstemp != curPartsTemplate)
+		if (partstemp != this.curPartsTemplate)
 			clear_parts = dirty = true;
 		if (sizetemp == null ||
-		    sizetemp != curSizeTemplate)
+		    sizetemp != this.curSizeTemplate)
 			clear_size = true;
 
-		curItem = item;
-		curDesignTemplate = designtemp;
-		curFullDesignTemplate = fulldesigntemp;
-		curSizeTemplate = sizetemp;
+		this.curItem = item;
+		this.curDesignTemplate = designtemp;
+		this.curFullDesignTemplate = fulldesigntemp;
+		this.curSizeTemplate = sizetemp;
 		var typeObj = null;
 		if (clear_color)
 			this.setColor(null);
 		else if (refresh_color)
 		{
-			var colcode = curColor['-code'];
-			var typcode = curType['-code'];
-			curColor = null;
-			curType = null;
+			var colcode = this.curColor['-code'];
+			var typcode = this.curType['-code'];
+			this.curColor = null;
+			this.curType = null;
 			var design = null;
-			var designlist = getTemplateCollection(this.jsonroot).DesignTemplate;
+			var designlist = this.jscache.getTemplateCollection().DesignTemplate;
 			var i;
 			for (i = 0; i < designlist.length; i++)
 			{
@@ -664,9 +682,9 @@ var Basket = function() {
 					{
 						if (collist[j]['-code'] == colcode)
 						{
-							curType = typeObj;
-							curColor = collist[j];
-							dress();
+							this.curType = typeObj;
+							this.curColor = collist[j];
+							dress(this);
 							break;
 						}
 					}
@@ -675,64 +693,74 @@ var Basket = function() {
 			}
 		}
 		if (clear_parts)
-			partsarray = [];
+			this.partsarray = [];
 		if (clear_size)
 		{
-			curSize = null;
-			curMatashita = -1;
+			this.curSize = null;
+			this.curMatashita = -1;
 		}
 		else if (refresh_parts)
-			refreshParts();
-		if (siltemp != curSilhouetteTemplate)
-			makeSilhouetteImagesFromTemplate(this.jsonroot, siltemp);
+			refreshParts(this);
+		if (siltemp != this.curSilhouetteTemplate)
+			makeSilhouetteImagesFromTemplate(this, this.jscache, siltemp);
 		if (dirty)
-			redraw(false);
+			this.redraw(false);
 	}
 
 	this.setColor = function(color)
 	{
+		var refresh = false;
 		// alert('setColor(' + color + ')');
 		if (color == null &&
-	    	    curColor == null)
+	    	    this.curColor == null)
 			return;
-		if (color == curColor)
+		if (color == this.curColor)
 			return;
-		if (curColor != null)
+		if (this.curColor != null)
 		{
 			if (color == null)
-				partsarray = [];
-			else if (parentTypeOf(color)['-partsFolder'] != curType['-partsFolder'])
-				refreshParts();
+			{
+				this.partsarray = [];
+				refresh = true;
+			}
+			else if (this.jscache.parentTypeOf(color)['-partsFolder'] != this.curType['-partsFolder'])
+				refresh = true;
 		}
-		curType = parentTypeOf(color);
-		curColor = color;
-		dress();
-		redraw(false);
+		this.curType = this.jscache.parentTypeOf(color);
+		this.curColor = color;
+		dress(this);
+		if (refresh)
+			refreshParts(this);
+		this.redraw(false);
 	}
 
 	this.setSize = function(size)
 	{
 		// alert('setColor(' + color + ')');
 		if (size == null &&
-	    	    curSize == null)
+	    	    this.curSize == null)
 			return;
-		if (size == curSize)
+		if (size == this.curSize)
 			return;
-		curSize = size;
+		this.curSize = size;
+	}
+	this.setSizeIndex = function(index)
+	{
+		this.setSize(index >= 0 ? this.jscache.sizeArrayCache[index] : null);
 	}
 
 	this.setMatashita = function(len)
 	{
 		// alert('setColor(' + color + ')');
 		if (len < 0 &&
-	    	    curMatshita < 0)
+	    	    this.curMatshita < 0)
 			return;
-		if (len == curMatashita)
+		if (len == this.curMatashita)
 			return;
-		curMatashita = len;
+		this.curMatashita = len;
 	}
 
-	function defaultPartsFileLoad(layobj, partsFile, foreground)
+	function defaultPartsFileLoad(pbasket, layobj, partsFile, foreground)
 	{
 		var repstr = partsFile.replace(/\/PNP\d\d/, '/PNP00');
 		if (repstr == partsFile)
@@ -743,9 +771,10 @@ var Basket = function() {
 			layobj.fimage = nimage;
 		else
 			layobj.bimage = nimage;
-		nimage.partsfile = partsFile;
+		nimage.partsfile = repstr;
 		nimage.onload = function() {
-			redraw(true);
+			console.log('parts image loaded:' + this.partsfile);
+			pbasket.redraw(true);
 		}
 		nimage.onerror = function() {
 			if (foreground)
@@ -753,21 +782,21 @@ var Basket = function() {
 			else
 				layobj.bimage = null;
 			console.log('parts image reload error:' + this.partsfile);
-			redraw(true);
+			pbasket.redraw(true);
 		}
 		nimage.src = repstr;
 		return repstr;
 	}
 
-	function selectParts(opt, code, mode)
+	function selectParts(pbasket, opt, code, mode)
 	{	
 		var i;
 		var layobj = null;
-		for (i = 0; i < partsarray.length; i++)
+		for (i = 0; i < pbasket.partsarray.length; i++)
 		{
-			if (partsarray[i].opt == opt)
+			if (pbasket.partsarray[i].opt == opt)
 			{
-				layobj = partsarray[i];
+				layobj = pbasket.partsarray[i];
 				break;
 			}
 		}
@@ -792,7 +821,7 @@ var Basket = function() {
 				{
 					case 'immediate':
 					case 'toggle':
-						redraw(false);
+						pbasket.redraw(false);
 				}
 			}
 			return -1;
@@ -800,8 +829,8 @@ var Basket = function() {
 		var local_partsarray = layer.parts;
 		if (!Array.isArray(local_partsarray))
 			local_partsarray = [layer.parts];
-		var pasrtobj;
-		var partsFolder = curType['-partsFolder'];
+		var partsobj;
+		var partsFolder = pbasket.curType['-partsFolder'];
 		for (i = 0; i < local_partsarray.length; i++)
 		{
 			partsobj = local_partsarray[i];
@@ -814,7 +843,7 @@ var Basket = function() {
 					if (resetval == null)
 						resetval = layer['-force'];
 	
-					return selectParts(opt, resetval, 'immediate');
+					return selectParts(pbasket, opt, resetval, 'immediate');
 				}
 				layobj.fimage = layobj.bimage = null;
 				layobj.partsCode = code;
@@ -828,13 +857,14 @@ var Basket = function() {
 					layobj.fimage = nimage;
 					nimage.partsfile = partsFile;
 					nimage.onload = function() {
-						redraw(true);
+						console.log('parts image loaded:' + this.partsfile);
+						pbasket.redraw(true);
 					}
 					nimage.onerror = function() {
 						layobj.fimage = null;
 						// console.log('parts image load error:' + this.partsfile);
-						if (defaultPartsFileLoad(layobj, partsFile, true) == null)
-							redraw(true);
+						if (defaultPartsFileLoad(pbasket, layobj, partsFile, true) == null)
+							pbasket.redraw(true);
 					}
 					nimage.src = partsFile;
 					if (onload_skipable && nimage.complete)
@@ -851,13 +881,14 @@ var Basket = function() {
 					layobj.bimage = nimage;
 					nimage.partsfile = partsFile;
 					nimage.onload = function() {
-						redraw(true);
+						console.log('parts image loaded:' + this.partsfile);
+						pbasket.redraw(true);
 					}
 					nimage.onerror = function() {
 						layobj.bimage = null;
 						// console.log('parts image load error:' + this.partsfile);
-						if (defaultPartsFileLoad(layobj, partsFile, false) == null)
-							redraw(true);
+						if (defaultPartsFileLoad(pbasket, layobj, partsFile, false) == null)
+							pbasket.redraw(true);
 					}
 					nimage.src = partsFile;
 					if (onload_skipable && nimage.complete)
@@ -871,7 +902,7 @@ var Basket = function() {
 						immediateDraw = true;
 				}
 				if (immediateDraw)
-					redraw(false);
+					pbasket.redraw(false);
 				return i;
 			}
 		}
@@ -880,21 +911,7 @@ var Basket = function() {
 
 	this.SelectParts = function(opt, code)
 	{	
-		return selectParts(opt, code, 'toggle');
+		return selectParts(this, opt, code, 'toggle');
 	}
-}
-
-function parentTypeOf(color)
-{
-	var type = null;
-	for (var i = 0; i < colorArrayCache.length; i++)
-	{
-		if (color == colorArrayCache[i])
-		{
-			type = typeArrayCache[i];
-			break;
-		}
-	}
-	return type;		
 }
 -->

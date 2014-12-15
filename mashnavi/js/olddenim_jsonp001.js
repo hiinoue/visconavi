@@ -1,9 +1,6 @@
 
 // グローバル
 
-var globalFullDesignTemplate = null; // String
-var globalPartsTemplate = null; // String
-
 var basket = null;
 var json_root = null;
 
@@ -27,8 +24,8 @@ function handle_json(jsondata)
 		alert('jsondata == null');
 		return;
 	}
-	basket = new Basket();
-	basket.jsonroot = jsondata;
+	basket = new Basket(jsondata);
+	// basket.jsonroot = jsondata;
 	var canvas = document.getElementById('front');
 	var context = canvas.getContext('2d');
 	basket.set_canvas_front(canvas, context);						
@@ -40,15 +37,16 @@ function handle_json(jsondata)
 	//オフライン描画コンテキストの取得
 	canvas = document.getElementById('offline');
 	context = canvas.getContext('2d');
-	basket.set_offimage(canvas, context);						
+	basket.set_offimage(canvas, context);
+						
 	hlist_item = document.getElementById('itemlist');
 	hlist_color = document.getElementById('colorlist');
 	hlist_size = document.getElementById('sizelist');
 	hlist_matashita = document.getElementById('matashita');
 	hlist_opt = document.getElementById('optlist');
 	hlist_parts = document.getElementById('partslist');
-	itemArrayCache = makeItemArray(json_root);
-	displayItemList(hlist_item, itemArrayCache);
+
+	displayItemList(hlist_item, basket.getItemCache());
 }
 
 //
@@ -162,58 +160,33 @@ function jsonp_connect()
 
 function setItemNo(itemno)
 {
-	var newItem = (itemno >= 0 ? itemArrayCache[itemno] : null);
-	if (newItem == basket.getItem())
-		return;
-	var makeCXArray = false;
-	var makeCArray = false;
-	var makePXArray = false;
-	var makePArray = false;
-	// alert('chItemImg alt=' + opt.alt);
-	var designtemp = newItem['-designTemplate'];
-	var sub = newItem['-sub'];
-	var siltemp = newItem['-silhouetteTemplate'];
-	var partstemp = newItem['-partsTemplate'];
+	var makeArray = basket.setItemNo(itemno);
 
-	if (designtemp == null ||
-	    designtemp != basket.getDesignTemplate())
-		makeCXArray = makeCArray = true;
-	else if (designtemp + sub != globalFullDesignTemplate)
-		makeCXArray = true;
-	if (partstemp != globalPartsTemplate)
-		makePXArray = makePArray = true;
-	basket.setItem(newItem);
 	itemIndexSelected = setSelected(hlist_item, itemIndexSelected, itemno);
-	if (makeCXArray)
-		colorArrayCache = makeColorArrayFromTemplate(json_root, designtemp ? designtemp + sub : null, designtemp ? null : newItem.Fablic.TypeList);
-	if (makeCArray)
-	{ 
-		displayColorList(hlist_color, colorArrayCache);
-		var newColorIndex = 0;	// default動作
-		basket.setColor(colorArrayCache[newColorIndex]);
-		colorIndexSelected = setSelected(hlist_color, colorIndexSelected, newColorIndex);
-	}
-	if (makePXArray)
+	if (makeArray != null)
 	{
-		optArrayCache = makeOptArrayFromTemplate(json_root, partstemp);
-		basket.makePartsArray(optArrayCache, partstemp);
+		if (makeArray[0])
+		{ 
+			displayColorList(hlist_color, basket.getColorCache());
+			colorIndexSelected = setSelected(hlist_color, colorIndexSelected, 0);
+		}
+		if (makeArray[1])
+		{ 
+			var optCache = basket.getOptCache();
+			displayOptList(hlist_opt, optCache);
+			var newOptIndex = (optCache == null || optCache.length == 0 ? -1 : 0);
+			displayOptParts(newOptIndex);
+		}
 	}
-	if (makePArray)
-	{ 
-		displayOptList(hlist_opt, optArrayCache);
-		var newOptIndex = (optArrayCache == null || optArrayCache.length == 0 ? -1 : 0);
-		displayOptParts(newOptIndex);
-	}
-	sizeArrayCache = makeSizeArray(newItem);
-	displaySizeList(hlist_size, sizeArrayCache);
+	displaySizeList(hlist_size, basket.getSizeCache());
 	// displayMatashitaList(hlist_matashita);
 	displayMatashitaSlider(hlist_matashita);
 }
 
 function displayOptParts(newOptIndex)
 {
-	partsArrayCache = makePartsArray(optArrayCache, newOptIndex);
-	displayPartsList(hlist_parts, partsArrayCache);
+	var jscache = basket.jscache;
+	displayPartsList(hlist_parts, jscache.makePartsArray(newOptIndex));
 	optIndexSelected = setSelected(hlist_opt, optIndexSelected, newOptIndex);
 }
 
@@ -225,7 +198,7 @@ function chItemImg(opt)
 
 function selectColorImage(colorIndex)
 {
-	basket.setColor(colorIndex >= 0 ? colorArrayCache[colorIndex] : null);
+	basket.setColor(colorIndex >= 0 ? basket.getColorCache()[colorIndex][0] : null);
 	colorIndexSelected = setSelected(hlist_color, colorIndexSelected, colorIndex);
 }
 function chColImg(opt)
@@ -234,12 +207,13 @@ function chColImg(opt)
 }
 function handleOpts(event)
 {
-	if (optArrayCache == null ||
-	    optArrayCache.length == 0)
+	var optCache = basket.getOptCache();
+	if (optCache == null ||
+	    optCache.length == 0)
 		return;
  	document.getElementById('opttab').style.visibility = 'visible';
 	document.getElementById('partstab').style.visibility = 'visible';
-	displayOptList(hlist_opt, optArrayCache);
+	displayOptList(hlist_opt, optCache);
 	newIndex = 0;
 	displayOptParts(newIndex);
 }
@@ -276,11 +250,13 @@ function nextPage(event)
 	var zidx = Number(selSize.style.zIndex);
 	if (zidx <= 0)
 	{
+		jscache = basket.jscache;
+
 		var prev = document.getElementById('prev');
  		selSize.style.zIndex = '3';
 		itemObj = basket.getItem();
-		sizeArrayCache = makeSizeArray(itemObj);
-		displaySizeList(hlist_size, sizeArrayCache);
+		var sizeArray = jscache.makeSizeArray(itemObj);
+		displaySizeList(hlist_size, sizeArray);
 		// displayMatashitaList(hlist_matashita);
 		displayMatashitaSlider(hlist_matashita);
 		prev.style.display = 'inline';
@@ -380,7 +356,7 @@ function nextPage(event)
 function selectSize(sizeIndex)
 {
 	// alert('size ' + sizeIndexSelected + ' -> ' + sizeIndex);
-	basket.setSize(sizeIndex >= 0 ? sizeArrayCache[sizeIndex] : null);
+	basket.setSizeIndex(sizeIndex);
 	sizeIndexSelected = setSelected(hlist_size, sizeIndexSelected, sizeIndex);
 	// alert('sizeInexSelected=' + sizeIndexSelected);
 }
@@ -398,7 +374,7 @@ function chMatashita(node)
 
 function chOptImg(node)
 {
-	if (node.name == curOptIndex)
+	if (node.name == basket.jscache.getOptIndex())
 		return;
 	var newIndex = node.name;
 	displayOptParts(newIndex);
@@ -410,7 +386,10 @@ function SelectPartsImage(opt, code)
 }
 function chPartsImg(opt)
 {
-	SelectPartsImage(optArrayCache[curOptIndex]['-code'], partsArrayCache[opt.alt]['-code']);
+	var jscache = basket.jscache;
+
+	SelectPartsImage(jscache.getOptObject(-1)['-code'], jscache.partsArrayCache[opt.alt]['-code']);
+	console.log('SelectPartsImage(' + jscache.getOptObject(-1)['-code'] + ',' + jscache.partsArrayCache[opt.alt]['-code'] + ')');
 }
 
 

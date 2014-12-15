@@ -14,7 +14,6 @@ var optIndexSelected = -1;
 var hlist_parts = null;
 var partsIndexSelected = -1;
 
-
 function displayItemList(iitemlist, itemarray)
 {
 	curItemIndex = -1;
@@ -45,10 +44,10 @@ function displayColorList(icolorlist, colorarray)
 	colorIndexSelected = -1;
 	for (i = 0; i < colorarray.length; i++)
 	{
-		var color =  colorarray[i];
+		var color =  colorarray[i][0];
 		if (rowPerType)
 		{
-			type = parentTypeOf(color);
+			type = colorarray[i][1];
 			if (type != tType)
 			{
 				trelem = document.createElement('tr');
@@ -160,10 +159,7 @@ function displayPartsList(ipartslist, partsarray)
 	partsIndexSelected = -1;
 	if (partsarray == null)
 		return;
-	var optObj = null;
-	if (optArrayCache != null &&
-	    curOptIndex >=0)
-		optObj = optArrayCache[curOptIndex];
+	var optObj = basket.jscache.getOptObject(-1);
 	var buttonFolder = 'catalog/PNP00Z/'; //// parentTypeOf(basket.getColor())['-buttonFolder'];
 	var selparts = basket.getSelectedParts(optObj['-code']);
 	var selindex = -1;
@@ -268,9 +264,11 @@ function displayMatashitaList(imatashitalist)
 
 function displayMatashitaSlider(imatashitalist)
 {
+	var jscache = basket.jscache;
+
 	if (imatashitalist == null)
 		return;
-	if (matashitaArray == null)
+	if (jscache.matashitaArray == null)
 	{
 		imatashitalist.style.visibility = 'hidden';
 		return;
@@ -278,13 +276,14 @@ function displayMatashitaSlider(imatashitalist)
 	imatashitalist.style.visibility = 'visible';
 	var selMatashita = basket.getMatashita();
 	if (selMatashita < 0)
-		selMatashita = matashitaDefault;
+		selMatashita = jscache.matashitaDefault;
 	var selindex = -1;
-	var min_matashita = matashitaArray[0];
-	var max_matashita = matashitaArray[matashitaArray.length - 1];
+	var cacheArray = jscache.matashitaArray;
+	var min_matashita = cacheArray[0];
+	var max_matashita = cacheArray[cacheArray.length - 1];
 	var step_matashita = 0.5;
-	if (matashitaArray.Length > 1)
-		step_matashita = matashitaArray[1] - matashitaArray[0];
+	if (cacheArray.Length > 1)
+		step_matashita = cacheArray[1] - cacheArray[0];
 
 	// alert('matashita min:' + min_matashita + ' max:' + max_matashita + ' step:' + step_matashita + ' value:' + selMatashita);
 	// jqeuryを使わない場合

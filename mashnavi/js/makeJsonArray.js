@@ -1,177 +1,264 @@
 <!--
 
+var NaviCacheHolder = function JsonHolder(json_root) {
 // グローバル
 
-var itemArrayCache = null;	// Array of item objects
-var typeArrayCache = null;	// Array of type objects corresponding to colorArrayCache
-var colorArrayCache = null;	// Array of color objects
-var sizeArrayCache = null;	// Array of size objects
-var matashitaArray = null;	// Array of matashita length
-var matashitaDefault = -1;
-var optArrayCache = null;	// Array of option objects
-var curOptIndex = -1;
-var partsArrayCache = null;	// Array of parts objects
+	this.root_node = json_root;
+
+	this.globalFullDesignTemplate = null; // String
+	this.globalPartsTemplate = null; // String
+
+	this.itemArrayCache = null;	// Array of item objects
+	this.colorArrayCache = null;	// Array of color objects
+	this.sizeArrayCache = null;	// Array of size objects
+	this.matashitaArray = null;	// Array of matashita length
+	this.matashitaDefault = -1;
+	this.optArrayCache = null;	// Array of option objects
+	this.curOptIndex = -1;
+	this.partsArrayCache = null;	// Array of parts objects
  
-function makeItemArray(root_node)
-{
-	return root_node.MashNavi.Item;
-}
+	this.itemArrayCache = makeItemArray(this.root_node);
 
-function getTemplateCollection(jsondata)
-{
-	return jsondata.MashNavi.TemplateCollection;
-}
-
-function makeColorArray(typelist)
-{
-	var children = typelist.Type;
-	// alert('length2=' + children.length);
-	colorarray = [];
-	typeArrayCache = [];
-	var count = 0;
-	for (var i = 0; i < children.length; i++)
+	this.parentTypeOf = function(color)
 	{
-		var leaves = children[i].detail
-		for (var j = 0; j < leaves.length; j++)
+		var type = null;
+		for (var i = 0; i < this.colorArrayCache.length; i++)
 		{
-			colorarray.push(leaves[j]);
-			typeArrayCache.push(children[i]);
-		}
-	}
-	return colorarray;
-}
-
-function makeColorArrayFromTemplate(jsondata, templateId, typelist)
-{
-	if (templateId == null)
-	{
-		globalFullDesignTemplate = null;
-		return makeColorArray(typelist);
-	}
-	if (templateId == globalFullDesignTemplate)
-	{
-		return colorArrayCache;
-	} 
-	globalFullDesignTemplate = templateId;
-
-	var design; 	// alert(template + ' not found');
-	var designlist = getTemplateCollection(jsondata).DesignTemplate;
-	for (i = 0; i < designlist.length; i++)
-	{
-		if (designlist[i]['-id'] == templateId)
-		{
-			design = designlist[i];
-			break;
-		}
-	}
-	var curTypeL = null;
-	if (design != null)
-		curTypeL = design.TypeList;
-	return makeColorArray(curTypeL);
-}
-
-function makeOptArrayFromTemplate(jsondata, templateId)
-{
-	if (templateId == globalPartsTemplate)
-		return optArrayCache;
-	globalPartsTemplate = templateId;
-	if (!templateId)
-	{
-		return null;
-	}
-
-	var optslist = getTemplateCollection(jsondata).PartsTemplate;
-	var optemp = null;
-	if (Array.isArray(optslist))
-	{
-		for (var i = 0; i < optslist.length; i++)
-		{
-			if (optslist[i]['-id'] == templateId)
+			if (color == this.colorArrayCache[i][0])
 			{
-				optemp = optslist[i];
+				type = this.colorArrayCache[i][1];
 				break;
 			}
 		}
+		return type;		
 	}
-	else
-	{
-		if (optslist['-id'] == templateId)
-			optemp = optslist;
-	}
-	if (optemp != null)
-		return optemp.option;
-	else
-		return null;
-}
 
-function makePartsArray(optarray, optindex)
-{
-	// alert('displayartsList cur=' + curOptIndex + ' => ' + optIndex);
-	if (optindex < 0)
-		return null;
-	if (optindex == curOptIndex)
-		return partsArrayCache;
-	var optObj = optarray[optindex];
-	curOptIndex = optindex;
-	if (Array.isArray(optObj.parts))
-		return optObj.parts;
-	return [optObj.parts];
-}
+	this.setItemNo = function(basket, itemno) {
+		var newItem = (itemno >= 0 ? this.itemArrayCache[itemno] : null);
+		if (newItem == basket.getItem())
+			return null;
+		var makeCXArray = false;
+		var makeCArray = false;
+		var makePXArray = false;
+		// alert('chItemImg alt=' + opt.alt);
+		var designtemp = newItem['-designTemplate'];
+		var sub = newItem['-sub'];
+		var siltemp = newItem['-silhouetteTemplate'];
+		var partstemp = newItem['-partsTemplate'];
 
-function makeSizeArray(itemObj)
-{
-	// alert('displayartsList cur=' + curOptIndex + ' => ' + optIndex);
-	matashitaArray = null;
-	matshitaDefault = -1;
-	if (itemObj == null)
-		return;
-	var templateId = itemObj['-sizeTemplate'];
-	//alert('templateId=' + templateId);
-	var sizetemp = null;
-	if (templateId != null)
-	{
-		var sizeList = getTemplateCollection(json_root).SizeTemplate;
-		if (Array.isArray(sizeList))
+		if (designtemp == null ||
+	    	    designtemp != basket.getDesignTemplate())
+			makeCXArray = makeCArray = true;
+		else if (designtemp + sub != this.globalFullDesignTemplate)
+			makeCXArray = true;
+		if (partstemp != this.globalPartsTemplate)
+			makePXArray = true;
+		basket.setItem(newItem);
+		if (makeCXArray)
+			this.colorArrayCache = makeColorArrayFromTemplate(this, designtemp ? designtemp + sub : null, designtemp ? null : newItem.Fablic.TypeList);
+		if (makeCArray)
+		{ 
+			var newColorIndex = 0;	// default動作
+			basket.setColor(this.colorArrayCache[newColorIndex][0]);
+		}
+		if (makePXArray)
 		{
-			for (i = 0; i < sizeList.length; i++)
+			this.optArrayCache = makeOptArrayFromTemplate(this, partstemp);
+			basket.makePartsArray(this.optArrayCache, partstemp);
+		}
+		this.sizeArrayCache = this.makeSizeArray(newItem);
+
+		return [makeCArray, makePXArray];
+	}
+
+
+	this.getOptIndex = function() {
+		return this.curOptIndex;
+	}
+
+	this.getOptObject = function(optIndex) {
+		if (this.optArrayCache != null)
+		{
+			if (optIndex < 0)
 			{
-				if (sizeList[i]['-id'] == templateId)
+				if (this.curOptIndex >= 0)
+					return this.optArrayCache[this.curOptIndex];
+			}
+			else if (optIndex < this.optArrayCache.length)
+				return this.optArrayCache[optIndex];
+		}
+		return null;
+	}
+
+	function makeItemArray(root_node)
+	{
+		return root_node.MashNavi.Item;
+	}
+
+	function localTemplateCollection(root_node)
+	{
+		return root_node.MashNavi.TemplateCollection;
+	}
+	this.getTemplateCollection = function()
+	{
+		return localTemplateCollection(this.root_node);
+	}
+
+	function makeColorArray(typelist)
+	{
+		var children = typelist.Type;
+		// alert('length2=' + children.length);
+		colorarray = [];
+		var count = 0;
+		for (var i = 0; i < children.length; i++)
+		{
+			var leaves = children[i].detail
+			for (var j = 0; j < leaves.length; j++)
+			{
+				colorarray.push([leaves[j], children[i]]);
+			}
+		}
+		return colorarray;
+	}
+
+	function makeColorArrayFromTemplate(pcache, templateId, typelist)
+	{
+		if (templateId == null)
+		{
+			pcache.globalFullDesignTemplate = null;
+			return makeColorArray(typelist);
+		}
+		if (templateId == pcache.globalFullDesignTemplate)
+		{
+			return colorArrayCache;
+		} 
+		pcache.globalFullDesignTemplate = templateId;
+
+		var design; 	// alert(template + ' not found');
+		var designlist = localTemplateCollection(pcache.root_node).DesignTemplate;
+		for (i = 0; i < designlist.length; i++)
+		{
+			if (designlist[i]['-id'] == templateId)
+			{
+				design = designlist[i];
+				break;
+			}
+		}
+		var curTypeL = null;
+		if (design != null)
+			curTypeL = design.TypeList;
+		return makeColorArray(curTypeL);
+	}
+
+	function makeOptArrayFromTemplate(pcache, templateId)
+	{
+		if (templateId == pcache.globalPartsTemplate)
+			return pcache.optArrayCache;
+		pcache.globalPartsTemplate = templateId;
+		if (!templateId)
+		{
+			return null;
+		}
+
+		var optslist = localTemplateCollection(pcache.root_node).PartsTemplate;
+		var optemp = null;
+		if (Array.isArray(optslist))
+		{
+			for (var i = 0; i < optslist.length; i++)
+			{
+				if (optslist[i]['-id'] == templateId)
 				{
-					sizetemp = sizeList[i];
-					sizetemp = sizetemp.SizeList;
+					optemp = optslist[i];
 					break;
 				}
 			}
 		}
-		else if (sizeList['-id'] == templateId)
-			sizetemp = sizeList.SizeList;
-	}
-	else
-	{
-		sizetemp = itemObj.Fablic.SizeList;
-	}
-	if (sizetemp == null)
-		return null;
-	//////sizetemp = sizetemp[0];
-	//alert('sizetemp=' + sizetemp);
-	var lengthMin = sizetemp['-lengthMin'];
-	if (lengthMin != null)
-	{
-		matashitaArray = [];
-		var lengthMax = sizetemp['-lengthMax'];
-		var lengthStep = sizetemp['-lengthStep'];
-		var lengthInit = sizetemp['-lengthInit'];
-		if (lengthInit != null)
-			matashitaDefault = Number(lengthInit);
-		//alert('length=' + lengthMin + ' ' + lengthMax + ' ' + lengthStep);
-		if (lengthStep == null)
-			lengthStep = 1;
-		for (var i = Number(lengthMin); i <= Number(lengthMax); i += Number(lengthStep))
+		else
 		{
-			matashitaArray.push(i);
+			if (optslist['-id'] == templateId)
+				optemp = optslist;
 		}
-		//alert('matashitaArray len=' + matashitaArray.length);
+		if (optemp != null)
+			return optemp.option;
+		else
+			return null;
 	}
-	return sizetemp.Size;
+
+	this.makePartsArray = function(optindex)
+	{
+		var optarray = this.optArrayCache;
+		// alert('this.makePartsArray cur=' + this.curOptIndex + ' => ' + optIndex);
+		if (optindex < 0)
+			return null;
+		if (optindex == this.curOptIndex)
+			return this.partsArrayCache;
+		var optObj = optarray[optindex];
+		this.curOptIndex = optindex;
+		var partsarray;
+		if (Array.isArray(optObj.parts))
+			partsarray = optObj.parts;
+		else
+			partsarray = [optObj.parts];
+		this.partsArrayCache = partsarray;
+		return partsarray;
+	}
+
+	this.makeSizeArray = function(itemObj)
+	{
+		// alert('makeSizeArray');
+		this.matashitaArray = null;
+		this.matshitaDefault = -1;
+		if (itemObj == null)
+			return;
+		var templateId = itemObj['-sizeTemplate'];
+		//alert('templateId=' + templateId);
+		var sizetemp = null;
+		if (templateId != null)
+		{
+			var sizeList = localTemplateCollection(this.root_node).SizeTemplate;
+			if (Array.isArray(sizeList))
+			{
+				for (i = 0; i < sizeList.length; i++)
+				{
+					if (sizeList[i]['-id'] == templateId)
+					{
+						sizetemp = sizeList[i];
+						sizetemp = sizetemp.SizeList;
+						break;
+					}
+				}
+			}
+			else if (sizeList['-id'] == templateId)
+				sizetemp = sizeList.SizeList;
+		}
+		else
+		{
+			sizetemp = itemObj.Fablic.SizeList;
+		}
+		if (sizetemp == null)
+			return null;
+		//////sizetemp = sizetemp[0];
+		//alert('sizetemp=' + sizetemp);
+		var lengthMin = sizetemp['-lengthMin'];
+		if (lengthMin != null)
+		{
+			this.matashitaArray = [];
+			var lengthMax = sizetemp['-lengthMax'];
+			var lengthStep = sizetemp['-lengthStep'];
+			var lengthInit = sizetemp['-lengthInit'];
+			if (lengthInit != null)
+				matashitaDefault = Number(lengthInit);
+			//alert('length=' + lengthMin + ' ' + lengthMax + ' ' + lengthStep);
+			if (lengthStep == null)
+				lengthStep = 1;
+			for (var i = Number(lengthMin); i <= Number(lengthMax); i += Number(lengthStep))
+			{
+				this.matashitaArray.push(i);
+			}
+			//alert('matashitaArray len=' + this.matashitaArray.length);
+		}
+		return sizetemp.Size;
+	}
+
 }
 -->

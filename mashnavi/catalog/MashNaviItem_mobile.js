@@ -1527,6 +1527,8 @@ callback (
                 "-code": "01R",
                 "-name": "ステッチ",
                 "-button": "STC01R.png",
+                "-front": "STC01R0.png",
+                "-back": "STC01R1.png",
                 "-tanka": "0"
               }
             }
@@ -2166,6 +2168,8 @@ callback (
                   "-code": "01P",
                   "-name": "MASH2050",
                   "-button": "DC501P.png",
+                  "-front": "DC501P0.png",
+                  "-back": "DC501P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-01"
                 },
@@ -2173,6 +2177,8 @@ callback (
                   "-code": "02P",
                   "-name": "キカ",
                   "-button": "DC502P.png",
+                  "-front": "DC502P0.png",
+                  "-back": "DC502P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-02"
                 },
@@ -2180,6 +2186,8 @@ callback (
                   "-code": "03P",
                   "-name": "迷いの森",
                   "-button": "DC503P.png",
+                  "-front": "DC503P0.png",
+                  "-back": "DC503P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-03"
                 },
@@ -2187,6 +2195,8 @@ callback (
                   "-code": "04P",
                   "-name": "ギャザリング",
                   "-button": "DC504P.png",
+                  "-front": "DC504P0.png",
+                  "-back": "DC504P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-04"
                 },
@@ -2194,6 +2204,8 @@ callback (
                   "-code": "05P",
                   "-name": "羽ボーダー",
                   "-button": "DC505P.png",
+                  "-front": "DC505P0.png",
+                  "-back": "DC505P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-05"
                 },
@@ -2201,6 +2213,8 @@ callback (
                   "-code": "06P",
                   "-name": "ジュエルボーダー",
                   "-button": "DC506P.png",
+                  "-front": "DC506P0.png",
+                  "-back": "DC506P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-06"
                 },
@@ -2208,6 +2222,8 @@ callback (
                   "-code": "07P",
                   "-name": "ドラゴン",
                   "-button": "DC507P.png",
+                  "-front": "DC507P0.png",
+                  "-back": "DC507P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-07"
                 },
@@ -2215,6 +2231,8 @@ callback (
                   "-code": "08P",
                   "-name": "ミニ千鳥",
                   "-button": "DC508P.png",
+                  "-front": "DC508P0.png",
+                  "-back": "DC508P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-08"
                 },
@@ -2222,6 +2240,8 @@ callback (
                   "-code": "09P",
                   "-name": "ムラドット",
                   "-button": "DC509P.png",
+                  "-front": "DC509P0.png",
+                  "-back": "DC509P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-09"
                 },
@@ -2229,6 +2249,8 @@ callback (
                   "-code": "10P",
                   "-name": "赤ドット",
                   "-button": "DC510P.png",
+                  "-front": "DC510P0.png",
+                  "-back": "DC510P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-10"
                 },
@@ -2236,6 +2258,8 @@ callback (
                   "-code": "11P",
                   "-name": "クロコ",
                   "-button": "DC511P.png",
+                  "-front": "DC511P0.png",
+                  "-back": "DC511P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-11"
                 },
@@ -2243,6 +2267,8 @@ callback (
                   "-code": "12P",
                   "-name": "千鳥ニット",
                   "-button": "DC512P.png",
+                  "-front": "DC512P0.png",
+                  "-back": "DC512P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-12"
                 },
@@ -2250,6 +2276,8 @@ callback (
                   "-code": "13P",
                   "-name": "ドビー",
                   "-button": "DC513P.png",
+                  "-front": "DC513P0.png",
+                  "-back": "DC513P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-13"
                 },
@@ -2257,6 +2285,8 @@ callback (
                   "-code": "14P",
                   "-name": "リバースサイド",
                   "-button": "DC514P.png",
+                  "-front": "DC514P0.png",
+                  "-back": "DC514P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-14"
                 },
@@ -2264,6 +2294,8 @@ callback (
                   "-code": "15P",
                   "-name": "ヒッコリー",
                   "-button": "DC515P.png",
+                  "-front": "DC515P0.png",
+                  "-back": "DC515P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-15"
                 },
@@ -2271,6 +2303,8 @@ callback (
                   "-code": "16P",
                   "-name": "チェック",
                   "-button": "DC516P.png",
+                  "-front": "DC516P0.png",
+                  "-back": "DC516P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-16"
                 },
@@ -2278,6 +2312,8 @@ callback (
                   "-code": "17P",
                   "-name": "タイダイ",
                   "-button": "DC517P.png",
+                  "-front": "DC517P0.png",
+                  "-back": "DC517P1.png",
                   "-tanka": "0",
                   "-swatch": "RD-17"
                 }
@@ -2777,6 +2813,8 @@ callback (
                 "-code": "01R",
                 "-name": "ステッチ",
                 "-button": "STC01R.png",
+                "-front": "STC01R0.png",
+                "-back": "STC01R1.png",
                 "-tanka": "0"
               }
             }
