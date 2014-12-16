@@ -17,6 +17,8 @@ var Basket = function(jsondata) {
 	this.curSizeTemplate = null; // String
 
 	const onload_skipable = false;
+	this.posx = -1;
+	this.posy = -1;
 	this.canvas_front = null;
 	this.context_front = null;
 	this.spec_front_width = -1;
@@ -224,9 +226,9 @@ Basket.prototype.redraw = function(ifPending) {
 			}
 		}
 	}
-	for (i = 0; i < silarray.length; i++)
+	for (i = 0; i < this.silarray.length; i++)
 	{
-		layobj = silarray[i];
+		layobj = this.silarray[i];
 		if (layobj.avatar_f != null && layobj.avatar_f != '')
 		{
 			img = layobj.fimage;
@@ -258,9 +260,9 @@ Basket.prototype.redraw = function(ifPending) {
 	try
 	{
 		if (this.canvas_front != null)
-			makeImage(this, this.canvas_front, 0, 0, this.context_front, 'f', 2);
+			makeImage(this, this.canvas_front, this.posx, this.posy, this.context_front, 'f', 2);
 		if (this.canvas_back != null)
-			makeImage(this, this.canvas_back, 0, 0, this.context_back, 'b', 1);
+			makeImage(this, this.canvas_back, this.posx, this.posy, this.context_back, 'b', 1);
 	}
 	catch (e)
 	{
@@ -312,12 +314,12 @@ Basket.prototype.redraw = function(ifPending) {
 		    imghgt <= 0)
 		{
 			baseimg = null;
-			if (silarray.length > 0)
+			if (pbasket.silarray.length > 0)
 			{
-				for (i = 0; i < silarray.length; i++)
+				for (i = 0; i < pbasket.silarray.length; i++)
 				{
-					imgwdt = silarray[0][imgname].width;
-					imghgt = silarray[0][imgname].height;
+					imgwdt = pbasket.silarray[0][imgname].width;
+					imghgt = pbasket.silarray[0][imgname].height;
 					if (imgwdt > 0 &&
 					    imghgt > 0)
 						break;
@@ -337,40 +339,63 @@ Basket.prototype.redraw = function(ifPending) {
 
 		var use_offline = false;
 		if (pbasket.partsarray.length > 0 ||
-		    silarray.length > 0)
+		    pbasket.silarray.length > 0)
 			use_offline = true;
-		// alert('makeImage(' + baseimg.width + ',' + baseimg.height + ') parts=' + pbasket.partsarray.length + ' sil=' + silarray.length);
-		if (use_offline)
-		{
-			// canvas.width = 
-			pbasket.offimage.width = imgwdt;
-			// canvas.height =
-			pbasket.offimage.height = imghgt;
-		}
+		// alert('makeImage(' + baseimg.width + ',' + baseimg.height + ') parts=' + pbasket.partsarray.length + ' sil=' + pbasket.silarray.length);
 
 		var tgt_width = imgwdt;
 		var tgt_height = imghgt;
+		var adjustWidth = false;
+		var adjustHeight = false;
 		if (tgt_width > spec_width)
+		{
+			if (tgt_height > spec_height)
+			{
+				if (spec_width * tgt_height < spec_height * tgt_width)
+					adjustWidth = true;
+				else
+					adjustHeigth = true;
+			}
+			else
+				adjustWidth = true;
+		}
+		else if (tgt_height > spec_height)
+			adjustHeight = true;
+
+		if (adjustWidth)
 		{
 			tgt_height *= (spec_width / tgt_width);
 			tgt_height = Math.floor(tgt_height);
 			tgt_width = spec_width;
 		}
-		else if (tgt_height > spec_height)
+		else if (adjustHeight)
 		{
 			tgt_width *= (spec_height / tgt_height);
 			tgt_width = Math.floor(tgt_width);
 			tgt_height = spec_height;
 		}
+		if (posx < 0)
+		{
+			posx = (canvas.width - tgt_width) / 2;
+		}
+		if (posy < 0)
+		{
+			posy = (canvas.height - tgt_height) / 2;
+		}
 
 		if (use_offline)
 		{
+			// canvas.width =
+			pbasket.offimage.width = tgt_width; // imgwdt;
+			// canvas.height =
+			pbasket.offimage.height = tgt_height; // imghgt;
+
 			if (baseimg != null)	
-				pbasket.offctx.drawImage(baseimg, 0, 0);
+				pbasket.offctx.drawImage(baseimg, 0, 0, tgt_width, tgt_height);
 			else
 			{
 				pbasket.offctx.fillStyle = 'rgb(255, 255, 255)';
-				pbasket.offctx.fillRect(0, 0, imgwdt, imghgt);
+				pbasket.offctx.fillRect(0, 0, tgt_width, tgt_height);
 			}
 //alert(' !! 2');
 			for (var i = 0; i < pbasket.partsarray.length; i++)
@@ -379,26 +404,26 @@ Basket.prototype.redraw = function(ifPending) {
 				var layimg = layobj[imgname];
 				if (layobj.partsCode != null &&
 		       		    layimg != null)
-					pbasket.offctx.drawImage(layimg, 0, 0);
+					pbasket.offctx.drawImage(layimg, 0, 0, tgt_width, tgt_height);
 			}
 //alert(' !! 3');
-			basedt = pbasket.offctx.getImageData(0, 0, imgwdt, imghgt);
+			basedt = pbasket.offctx.getImageData(0, 0, tgt_width, tgt_height);
 			pbasket.offctx.globalCompositeOperation = 'copy';
 		}
 		else if (baseimg != null)
 		{
 			context.clearRect(0, 0, canvas.width, canvas.height);
-			context.drawImage(baseimg, 0, 0, tgt_width, tgt_height);
+			context.drawImage(baseimg, posx, posy, tgt_width, tgt_height);
 		}
 
-		var pic = imgwdt * imghgt;
+		var pic = tgt_width * tgt_height;
 		var avatar;
 		var imgdt;
 		var rgbv;
-		for (i = 0; i < silarray.length; i++)
+		for (i = 0; i < pbasket.silarray.length; i++)
 		{
-			layobj = silarray[i];
-// alert(' !! 4-' + i + ' (of ' + silarray.length + ') operation=' + layobj.operation);
+			layobj = pbasket.silarray[i];
+// alert(' !! 4-' + i + ' (of ' + pbasket.silarray.length + ') operation=' + layobj.operation);
 			avatar = layobj[avtname];
 			if (avatar == null || avatar == '')
 				continue;
@@ -423,8 +448,8 @@ Basket.prototype.redraw = function(ifPending) {
 				case 'multiply':
 					if (imgdt == null)
 					{
-	    					pbasket.offctx.drawImage(img, 0, 0);
-	    					imgdt = pbasket.offctx.getImageData(0, 0, imgwdt, imghgt);
+	    					pbasket.offctx.drawImage(img, 0, 0, tgt_width, tgt_height);
+	    					imgdt = pbasket.offctx.getImageData(0, 0, tgt_width, tgt_height);
 						layobj[idtname] = imgdt;
 					}
 					for (var j = 0; j < 4 * pic; j++)
@@ -436,8 +461,8 @@ Basket.prototype.redraw = function(ifPending) {
 				case 'add':
 					if (imgdt == null)
 					{
-						pbasket.offctx.drawImage(img, 0, 0);
-						imgdt = pbasket.offctx.getImageData(0, 0, imgwdt, imghgt);
+						pbasket.offctx.drawImage(img, 0, 0, tgt_width, tgt_height);
+						imgdt = pbasket.offctx.getImageData(0, 0, tgt_width, tgt_height);
 						layobj[idtname] = imgdt;
 					}
 					for (var j = 0; j < 4 * pic; j++)
@@ -449,8 +474,8 @@ Basket.prototype.redraw = function(ifPending) {
 				case '%mask':
 					if (imgdt == null)
 					{
-						pbasket.offctx.drawImage(img, 0, 0);
-						imgdt = pbasket.offctx.getImageData(0, 0, imgwdt, imghgt);
+						pbasket.offctx.drawImage(img, 0, 0, tgt_width, tgt_height);
+						imgdt = pbasket.offctx.getImageData(0, 0, tgt_width, tgt_height);
 						layobj[idtname] = imgdt;
 					}
 					for (var j = 0; j < pic; j++)
@@ -460,7 +485,7 @@ Basket.prototype.redraw = function(ifPending) {
 					/*** backdtはうまく利用することが出来ない
 					//if (backdt == undefined)
 					{
-						pbasket.offctx.drawImage(backimg, 0, 0);
+						pbasket.offctx.drawImage(backimg, 0, 0, tgt_width, tgt_height);
    						backdt = pbasket.offctx.getImageData(0, 0, backimg.width, backimg.height);
 					}
 					***/
@@ -484,10 +509,10 @@ Basket.prototype.redraw = function(ifPending) {
 			for (i = 0; i < whiteBoundary; i++)
 			{
 				context.beginPath();
-				context.moveTo(i, i);
-				context.lineTo(i, tgt_height - i - 1);
-				context.lineTo(tgt_width - i - 1, tgt_height - i - 1);
-				context.lineTo(tgt_width - i - 1, i);
+				context.moveTo(posx + i, posy + i);
+				context.lineTo(posx + i, posy + tgt_height - i - 1);
+				context.lineTo(posx + tgt_width - i - 1, posy + tgt_height - i - 1);
+				context.lineTo(posx + tgt_width - i - 1, posy + i);
 				context.closePath();
 				context.stroke();
 			}
@@ -592,7 +617,7 @@ Basket.prototype.setItem = function(item)
 		pbasket.curSilhouetteTemplate = templateId;
 		if (!pbasket.curSilhouetteTemplate)
 		{
-			silarray = [];
+			pbasket.silarray = [];
 			return;
 		}
 
@@ -607,7 +632,7 @@ Basket.prototype.setItem = function(item)
 			}
 		}
 		var laylist = silhouette.Layer;
-		silarray = [];
+		pbasket.silarray = [];
 		var layobj;
 		var nimage;
 		var avatarf;
@@ -621,7 +646,7 @@ Basket.prototype.setItem = function(item)
 			layobj.avatar_f = avatarf;
 			avatarb = layer['-avatar_b'];
 			layobj.avatar_b = avatarb;
-			silarray.push(layobj);
+			pbasket.silarray.push(layobj);
 			if (avatarf != null && avatarf != '')
 			{
 				layobj.fimage = nimage = new Image();
