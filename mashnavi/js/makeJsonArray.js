@@ -240,7 +240,7 @@ NaviCacheHolder.prototype.makeSizeArray = function(itemObj)
 		var lengthStep = sizetemp['-lengthStep'];
 		var lengthInit = sizetemp['-lengthInit'];
 		if (lengthInit != null)
-			matashitaDefault = Number(lengthInit);
+			this.matashitaDefault = Number(lengthInit);
 		//alert('length=' + lengthMin + ' ' + lengthMax + ' ' + lengthStep);
 		if (lengthStep == null)
 			lengthStep = 1;

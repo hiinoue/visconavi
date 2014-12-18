@@ -86,24 +86,25 @@ function fileSystemApiTest()
 					dirEntry.getFile('BSE010.jpg' /* download_name */, {create: true, exclusive: false}, function(fileEntry) {
 					  fileEntry.createWriter(function(fileWriter) {
 					    fileWriter.onwriteend = function(e) {
-						console.log('書き込み完了');
+						if (typeof(console) != 'undefined')
+							console.log('書き込み完了');
 					    };
 					    fileWriter.onerror = function(e) {
-						console.log('書き込みエラー: ' + e.toString());
+						alert('書き込みエラー: ' + e.toString());
 					    };
 					    fileWriter.write(blobData);
 					  });
 					}, function(e) {
-						console.log('getfile エラー:' + e.message);
+						alert('getfile エラー:' + e.message);
 				        });
 				      }, function (e) {
-						console.log('getDirectory エラー:' + e.message);
+						alert('getDirectory エラー:' + e.message);
 				      });
 				    }, function (e) {
-					console.log('getDirectory エラー:' + e.message);
+					alert('getDirectory エラー:' + e.message);
 				    });
 				}, function(e) {
-					console.log('reqFileSystem エラー:' + e.message);
+					alert('reqFileSystem エラー:' + e.message);
 				  });
 				});
 			}
@@ -111,7 +112,7 @@ function fileSystemApiTest()
 				error(this, this.status);
 		};
 		xhr.onerror = function () {
-alert('error:download ' + download_file);
+			alert('error:download ' + download_file);
 			error(this, this.status);
 		};
 		xhr.send();
@@ -123,7 +124,7 @@ function jsonp_connect()
 	alert('jsonp_connect() browser=' + navigator.appName + ' agent=' + navigator.userAgent + ' version=' + navigator.appVersion);
 
 	fileSystemApiTest();
-
+	alert('canvas.toDataURL=' + document.createElement('canvas').toDataURL('image/jpeg').indexOf('data:image/jpeg'));
 	var local = true;
 	var via_script = true;
 	// alert('jsonp_connect local=' + local + ' via_script=' + via_script);
@@ -132,7 +133,7 @@ function jsonp_connect()
 
 	var jsonfile = 'catalog/MashNaviItem_mobile.js';
 	if (!local)
-		jsonfile = 'http://100.126.1.62/mashnavi/' + jsonfile;
+		jsonfile = 'http://192.168.0.128/mashnavi/' + jsonfile;
 
 	if (via_script)
 	{
@@ -269,8 +270,8 @@ function nextPage(event)
 	}
 
 	var no_get;
-	var urlfile_noget = 'http://100.126.1.62/scripts/BottomsOrderno.aspx?navitype=PN&machineId=00';
-	var urlfile = 'http://100.126.1.62/scripts/BottomsOrder.aspx';
+	var urlfile_noget = 'http://192.168.0.128/scripts/BottomsOrderno.aspx?navitype=PN&machineId=00';
+	var urlfile = 'http://192.168.0.128/scripts/BottomsOrder.aspx';
 	var use_gui_form = false; // true/false何れでもOK。blobを使用しておりそのためmultipart/form-dataが
 				  // 自然に設定されると思われる。
 	var upload_add = false;
@@ -389,7 +390,8 @@ function chPartsImg(opt)
 	var jscache = basket.jscache;
 
 	SelectPartsImage(jscache.getOptObject(-1)['-code'], jscache.partsArrayCache[opt.alt]['-code']);
-	console.log('SelectPartsImage(' + jscache.getOptObject(-1)['-code'] + ',' + jscache.partsArrayCache[opt.alt]['-code'] + ')');
+	if (typeof(console) != 'undefined')
+		console.log('SelectPartsImage(' + jscache.getOptObject(-1)['-code'] + ',' + jscache.partsArrayCache[opt.alt]['-code'] + ')');
 }
 
 

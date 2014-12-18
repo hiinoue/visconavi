@@ -653,12 +653,13 @@ Basket.prototype.setItem = function(item)
 				nimage.crossOrigin = 'anonymous';
 				nimage.silfile = avatarf;
 				nimage.onload = function() {
-					console.log('silhouette front image loaded:' + this.silfile);
+					if (typeof(console) != 'undefined')
+						console.log('silhouette front image loaded:' + this.silfile);
 					pbasket.redraw(true);
 				}
 				nimage.onerror = function() {
 					layobj.fimage = null;
-					console.log('silhouette image load error:' + this.silfile);
+					alert('silhouette image load error:' + this.silfile);
 					pbasket.redraw(true);
 				}
 				nimage.src = avatarf;
@@ -669,12 +670,13 @@ Basket.prototype.setItem = function(item)
 				nimage.crossOrigin = 'anonymous';
 				nimage.silfile = avatarb;
 				nimage.onload = function() {
-					console.log('silhouette back image loaded:' + this.silfile)
+					if (typeof(console) != 'undefined')
+						console.log('silhouette back image loaded:' + this.silfile)
 					pbasket.redraw(true);
 				}
 				nimage.onerror = function() {
 					layobj.bimage = null;
-					console.log('silhouette image load error:' + this.silfile);
+					alert('silhouette image load error:' + this.silfile);
 					pbasket.redraw(true);
 				}
 				nimage.src = avatarb;
@@ -812,7 +814,8 @@ function selectParts(pbasket, opt, code, mode)
 				layobj.fimage = nimage;
 				nimage.partsfile = partsFile;
 				nimage.onload = function() {
-					console.log('parts image loaded:' + this.partsfile);
+					if (typeof(console) != 'undefined')
+						console.log('parts image loaded:' + this.partsfile);
 					pbasket.redraw(true);
 				}
 				nimage.onerror = function() {
@@ -836,7 +839,8 @@ function selectParts(pbasket, opt, code, mode)
 				layobj.bimage = nimage;
 				nimage.partsfile = partsFile;
 				nimage.onload = function() {
-					console.log('parts image loaded:' + this.partsfile);
+					if (typeof(console) != 'undefined')
+						console.log('parts image loaded:' + this.partsfile);
 					pbasket.redraw(true);
 				}
 				nimage.onerror = function() {
@@ -876,7 +880,8 @@ function selectParts(pbasket, opt, code, mode)
 			layobj.bimage = nimage;
 		nimage.partsfile = repstr;
 		nimage.onload = function() {
-			console.log('parts image loaded:' + this.partsfile);
+			if (typeof(console) != 'undefined')
+				console.log('parts image loaded:' + this.partsfile);
 			pbasket.redraw(true);
 		}
 		nimage.onerror = function() {
@@ -884,7 +889,7 @@ function selectParts(pbasket, opt, code, mode)
 				layobj.fimage = null;
 			else
 				layobj.bimage = null;
-			console.log('parts image reload error:' + this.partsfile);
+			alert('parts image reload error:' + this.partsfile);
 			pbasket.redraw(true);
 		}
 		nimage.src = repstr;
@@ -907,12 +912,13 @@ function dress(pbasket) {
 			fimg.crossOrigin = 'anonymous';
 			fimg.colfile = color_f;
 			fimg.onload = function() {
-				console.log('front base image loaded:' + this.colfile);
+				if (typeof(console) != 'undefined')
+					console.log('front base image loaded:' + this.colfile);
 				pbasket.redraw(true);
 			}
 			fimg.onerror = function() {
 				pbasket.base.fimage = null;
-				console.log('base image load error:' + this.colfile);
+				alert.log('base image load error:' + this.colfile);
 				pbasket.redraw(true);
 			}
 			fimg.src = color_f;
@@ -923,12 +929,13 @@ function dress(pbasket) {
 			bimg.crossOrigin = 'anonymous';
 			bimg.colfile = color_b;
 			bimg.onload = function() {
-				console.log('back base image loaded:' + this.colfile);
+				if (typeof(console) != 'undefined')
+					console.log('back base image loaded:' + this.colfile);
 				pbasket.redraw(true);
 			}
 			bimg.onerror = function() {
 				pbasket.base.bimage = null;
-				console.log('base image load error:' + this.colfile);
+				alert('base image load error:' + this.colfile);
 				pbasket.redraw(true);
 			}
 			bimg.src = color_b;
