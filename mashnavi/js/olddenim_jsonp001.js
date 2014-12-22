@@ -269,8 +269,19 @@ function nextPage(event)
 		return;
 	}
 
+	if (basket.curColor == null)
+	{
+		alert('アイテム・色柄未選択！！！');
+		return;
+	}
+	if (basket.curSize == null)
+	{
+		alert('サイズ未入力！！！');
+		return;
+	}
 	var no_get;
-	var urlfile_noget = 'http://192.168.0.128/scripts/BottomsOrderno.aspx?navitype=PN&machineId=00';
+	var navitype = (basket.curPartsTemplate != null ? 'PN' : 'MN');
+	var urlfile_noget = 'http://192.168.0.128/scripts/BottomsOrderno.aspx?navitype=' + navitype + '&machineId=00';
 	var urlfile = 'http://192.168.0.128/scripts/BottomsOrder.aspx';
 	var use_gui_form = false; // true/false何れでもOK。blobを使用しておりそのためmultipart/form-dataが
 				  // 自然に設定されると思われる。
@@ -308,7 +319,11 @@ function nextPage(event)
 		}
 
 		no_get = false;
-		var para_data = ['<waiwa del="yes" /waiwa>'];
+		var orderXML = basket.ItemToXML(orderno);
+		var para_data = [(new XMLSerializer()).serializeToString(orderXML)]; /* 
+			['<order><order_no xmlns="http://www.w3.org/1999/xhtml">PN000099</order_no><order_date xmlns="http://www.w3.org/1999/xhtml"></order_date><shopid xmlns="http://www.w3.org/1999/xhtml">0</shopid><test_card_flag xmlns="http://www.w3.org/1999/xhtml">false</test_card_flag><user_name1 xmlns="http://www.w3.org/1999/xhtml"></user_name1><user_name1 xmlns="http://www.w3.org/1999/xhtml"></user_name1><total_amount xmlns="http://www.w3.org/1999/xhtml">14800</total_amount><total_tax xmlns="http://www.w3.org/1999/xhtml">1184</total_tax><avatar_front xmlns="http://www.w3.org/1999/xhtml"></avatar_front><avatar_back xmlns="http://www.w3.org/1999/xhtml"></avatar_back><custom_give_date xmlns="http://www.w3.org/1999/xhtml"></custom_give_date><express_flag xmlns="http://www.w3.org/1999/xhtml">0</express_flag><custom_flag xmlns="http://www.w3.org/1999/xhtml">0</custom_flag><order_bill xmlns="http://www.w3.org/1999/xhtml"><item_number>MASHNAVI-11</item_number><item_name>Ｕネックチュニック</item_name><item_type></item_type><item_type_name>ナスタチウム</item_type_name><detail></detail><detail_name>GR</detail_name><nbs_code>xxxxxxx</nbs_code><nbs_size_code>XX</nbs_size_code><nbs_color_code>XX</nbs_color_code><fabric_code>M4206-2B-MN</fabric_code><fabric_width>1440</fabric_width><fabric_height>1980</fabric_height><item_image_front></item_image_front><item_image_back></item_image_back><size_text>11</size_text><unit_price>14800</unit_price><tax>1184</tax><order_quantity>1</order_quantity><order_options><item><order_option><option_number>1</option_number><layout_flag>true</layout_flag><layout_order>0</layout_order><design_code>GM0003</design_code><design_name>ナスタチウム</design_name><option_code>GR</option_code><option_name>01</option_name><order_quantity></order_quantity><unit_price>14800</unit_price><tax>1184</tax></order_option></item></order_options><under_crotch>-1</under_crotch></order_bill></order>']; */
+
+		// console.log(para_data);
 		var oMyForm;
 		var oMyBlob;
 		if (use_bbuilder)
@@ -348,6 +363,7 @@ function nextPage(event)
 	  .then(function(data, status) {
 		if (!canceled)
 			alert('upload応答=' + data);
+		prevPage(event);
 	    })
 	  .fail(function(jqXHR, status, errorThrown) {
 		alert('エラー発生 no_get=' + no_get + ':' + status + ',' + jqXHR.responseText);

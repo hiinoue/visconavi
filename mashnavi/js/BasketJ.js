@@ -742,7 +742,303 @@ Basket.prototype.setMatashita = function(len)
 Basket.prototype.SelectParts = function(opt, code)
 {	
 	return selectParts(this, opt, code, 'toggle');
+}
 
+Basket.prototype.ItemToXML = function(orderNo)
+{
+	var root = $.parseXML('<order></order>');
+	var itemObj = this.curItem;
+	var typeObj = this.curType;
+	var colorObj = this.curColor;
+	var sizeObj = this.curSize;
+	var mata = this.curMatashita;
+
+	// 暫定的 ナビ共通
+	var shopid = '0';
+	var order_date = null;
+	var user_name1 = null;
+	var user_name2 = null;
+	var custom_give_date = null;
+	var express_flag = 0;
+	var test_card_flag = 'false';
+	var custom_flag = 0;
+	var color_image = null;
+
+	var orderXML = $(root).find('order')[0];
+
+	if (orderNo.substr(0, 2) == 'PN')
+		return DenimNaviItemToXML(orderNo);
+	else
+		return MashNaviItemToXML(orderNo);
+
+	function DenimNaviItemToXML(orderNo)
+	{
+		// 暫定的
+		var total_amount = sizeObj['-price'];
+		var total_tax = total_amount * 0.08;
+		var avatar_front = null;
+		var avatar_back = null;
+		var nbs_code = 'xxxxxxx';
+		var nbs_size_code = 'XX';
+		var nbs_color_code = 'XX';
+		var fabric_width = sizeObj['-width'];
+		var fabric_height = sizeObj['-height'];
+		var option_image = null;
+
+		// order_no
+		insertTextElement(orderXML, 'order_no', orderNo);
+		// order_date
+		insertTextElement(orderXML, 'order_date', order_date);
+		// shopid
+		insertTextElement(orderXML, 'shopid', shopid);
+		// test_card_flag
+		insertTextElement(orderXML, 'test_card_flag', test_card_flag);
+		// user_name1
+		insertTextElement(orderXML, 'user_name1', user_name1);
+		// user_name2
+		insertTextElement(orderXML, 'user_name2', user_name2);
+		// total_amount
+		insertTextElement(orderXML, 'total_amount', total_amount);
+		// total_tax
+		insertTextElement(orderXML, 'total_tax', total_tax);
+		// avatar_front
+		insertTextElement(orderXML, 'avatar_front', avatar_front);
+		// avatar_back
+		insertTextElement(orderXML, 'avatar_back', avatar_back);
+		// custom_give_date
+		insertTextElement(orderXML, 'custom_give_date', custom_give_date);
+		// express_flag
+		insertTextElement(orderXML, 'express_flag', express_flag);
+		// express_flag
+		insertTextElement(orderXML, 'custom_flag', custom_flag);
+		// <order_bill> 開始
+		var order_bill = insertElement(orderXML, 'order_bill');
+		// <item_number></item_number>
+		insertTextElement(order_bill, 'item_number', itemObj['-code']);
+		// <item_code></item_code>
+		insertTextElement(order_bill, 'item_code', nbs_code + '-' + nbs_size_code + '-' + nbs_color_code);
+		// <item_type>7</item_type>
+		// <item_type_name></item_type_name>
+		insertTextElement(order_bill, 'item_type_name', itemObj['-name']);
+		// <spec>1</spec>
+		insertTextElement(order_bill, 'detail', typeObj['-code']);
+		// <detail_name></detail_name>
+		insertTextElement(order_bill, 'detail_name', colorObj['-name']);
+		// <fabric_code></fabric_code>
+		insertTextElement(order_bill, 'fabric_code', itemObj.Fablic['-code']);
+		// <fabric_width></fabric_width>
+		insertTextElement(order_bill, 'fabric_width', fabric_width);
+		// <fabric_height></fabric_height>
+		insertTextElement(order_bill, 'fabric_height', fabric_height);
+		// <item_image_front></item_image_front>
+		insertTextElement(order_bill,'item_image_front', avatar_front);
+		// <item_image_back></item_image_back>
+		insertTextElement(order_bill,'item_image_back', avatar_back);
+		// <size_text></size_text>
+		insertTextElement(order_bill, 'size_text', sizeObj['-code']);
+		// <under_crotch>70</under_crotch>
+		if (mata !=null && Number(mata) > 0)
+			insertTextElement(order_bill, 'under_crotch', mata);
+		// <unit_price></unit_price>
+		insertTextElement(order_bill, 'unit_price', total_amount);
+		// <tax></tax>
+		insertTextElement(order_bill, 'tax', total_tax);
+		// <order_quantity></order_quantity>
+		insertTextElement(order_bill, 'order_quantity', '1');
+		// <thight_size/>
+		// <waist_size/>
+		// <hip_size/>
+		// <body_height/>
+		// <order_options> 開始
+		var option_number = 1;
+		var order_options = insertElement(order_bill, 'order_options');
+		// <item> 開始
+
+		// ベースカラー
+		var item = insertElement(order_options, 'item');
+	        // <order_option> 開始
+ 		var order_option = insertElement(item, 'order_option');
+		// <option_number></option_number>
+		insertTextElement(order_option, 'option_number', option_number++);
+		// <layered_order>/layered_order>
+		insertTextElement(order_option, 'layout_order', '0');
+		// <design_type></design_type>
+		insertTextElement(order_option, 'design_type', 'n');
+		// <sew_flag></sew_flag>
+		insertTextElement(order_option, 'sew_flag', 'false');
+		// <layout_flag></layout_flag>
+		insertTextElement(order_option, 'layout_flag', 'true');
+		// <line_stone_flag></line_stone_flag>
+		insertTextElement(order_option, 'line_stone_sew_flag', 'false');
+		// <option_type/>
+		// <option_type_name></option_type_name>
+		insertTextElement(order_option, 'option_type_name', 'ベースカラー');
+		// <option_inner_number>3</option_inner_number>
+		// <option_name></option_name>
+		insertTextElement(order_option, 'option_name', colorObj['-name']);
+		// <option_file_name>PNB37B-A-2</option_file_name>
+		// <option_layer_name></option_layer_name>
+		insertTextElement(order_option, 'option_layer_name', colorObj['-code']);
+		// <option_swatch>Z-03</option_swatch>
+		// <print_pos_x></print_pos_x>
+		insertTextElement(order_option, 'print_pos_x', '0');
+		// <print_pos_y></print_pos_y>
+		insertTextElement(order_option, 'print_pos_y', '0');
+		// <unit_price></unit_price>
+		insertTextElement(order_option, 'unit_price', total_amount);
+		// <tax></tax>
+		insertTextElement(order_option, 'tax', total_tax);
+		// <order_quantity></order_quantity>
+		insertTextElement(order_option, 'order_quantity', '0');
+		// <option_image>
+		insertTextElement(order_option, 'option_image', color_image);
+		// </order_option> 終了
+		// </item> ベースカラー 終了
+		var plen = this.partsarray.length;
+		var layobj;
+		for (var i = 0; i < plen; i++)
+		{
+			layobj = this.partsarray[i];
+		}
+
+		return orderXML;
+	}
+
+	function MashNaviItemToXML(orderNo)
+	{
+		// 暫定的
+		var total_amount = sizeObj['-price'];
+		var total_tax = total_amount * 0.08;
+		var avatar_front = null;
+		var avatar_back = null;
+		var nbs_code = 'xxxxxxx';
+		var nbs_size_code = 'XX';
+		var nbs_color_code = 'XX';
+		var fabric_width = sizeObj['-width'];
+		var fabric_height = sizeObj['-height'];
+		var option_image = null;
+
+		// order_no
+		insertTextElement(orderXML, 'order_no', orderNo);
+		// order_date
+		insertTextElement(orderXML, 'order_date', order_date);
+		// shopid
+		insertTextElement(orderXML, 'shopid', shopid);
+		// test_card_flag
+		insertTextElement(orderXML, 'test_card_flag', test_card_flag);
+		// user_name1
+		insertTextElement(orderXML, 'user_name1', user_name1);
+		// user_name2
+		insertTextElement(orderXML, 'user_name2', user_name2);
+		// total_amount
+		insertTextElement(orderXML, 'total_amount', total_amount);
+		// total_tax
+		insertTextElement(orderXML, 'total_tax', total_tax);
+		// avatar_front
+		insertTextElement(orderXML, 'avatar_front', avatar_front);
+		// avatar_back
+		insertTextElement(orderXML, 'avatar_back', avatar_back);
+		// custom_give_date
+		insertTextElement(orderXML, 'custom_give_date', custom_give_date);
+		// express_flag
+		insertTextElement(orderXML, 'express_flag', express_flag);
+		// express_flag
+		insertTextElement(orderXML, 'custom_flag', custom_flag);
+
+		// <order_bill> 開始
+		var order_bill = insertElement(orderXML, 'order_bill');
+		// <item_number></item_number>
+		insertTextElement(order_bill, 'item_number', itemObj['-code']);
+		// <item_name></item_name>
+		insertTextElement(order_bill, 'item_name', itemObj['-name']);
+		// <item_type /> mashnaviでは設定しない？
+		insertTextElement(order_bill, 'item_type', null);
+		// <item_type_name></item_type_name>
+		insertTextElement(order_bill, 'item_type_name', typeObj['-name']);
+		// <detail /> mashnaviでは設定しない？
+		insertTextElement(order_bill, 'detail', null);
+		// <detail_name></detail_name>
+		insertTextElement(order_bill, 'detail_name', colorObj['-code']);
+		// <nbs_code></nbs_code>
+		insertTextElement(order_bill, 'nbs_code', nbs_code);
+		// <nbs_size_code></nbs_size_code>
+		insertTextElement(order_bill, 'nbs_size_code', nbs_size_code);
+		// <nbs_color_code></nbs_color_code>
+		insertTextElement(order_bill, 'nbs_color_code',	nbs_color_code);
+		// <fabric_code></fabric_code>
+		insertTextElement(order_bill, 'fabric_code', itemObj.Fablic['-code']);
+		// <fabric_width></fabric_width>
+		insertTextElement(order_bill, 'fabric_width', fabric_width);
+		// <fabric_height></fabric_height>
+		insertTextElement(order_bill, 'fabric_height', fabric_height);
+		// <item_image_front></item_image_front>
+		insertTextElement(order_bill,'item_image_front', avatar_front);
+		// <item_image_back></item_image_back>
+		insertTextElement(order_bill, 'item_image_back', avatar_back);
+		// <size_text></size_text>
+		insertTextElement(order_bill, 'size_text', sizeObj['-code']);
+		// <unit_price></unit_price>
+		insertTextElement(order_bill, 'unit_price', total_amount);
+		// <tax></tax>
+		insertTextElement(order_bill, 'tax', total_tax);
+		// <order_quantity>1</order_quantity>
+		insertTextElement(order_bill, 'order_quantity', '1');
+		// <order_options> 開始
+		var order_options = insertElement(order_bill, 'order_options');
+		// <item> 開始
+		var item = insertElement(order_options, 'item');
+	        // <order_option> 開始
+		var order_option = insertElement(item, 'order_option');
+		// <option_number>1</option_number>
+		insertTextElement(order_option, 'option_number', '1');
+		// <layout_flag>true</layout_flag>
+		insertTextElement(order_option, 'layout_flag', 'true');
+		// <layered_order>0</layered_order>
+		insertTextElement(order_option, 'layout_order', '0');
+		// <design_code></design_code>
+		insertTextElement(order_option, 'design_code', typeObj['-code']);
+		// <design_name></design_name>
+		insertTextElement(order_option, 'design_name', typeObj['-name']);
+		// <option_code></option_name>
+		insertTextElement(order_option, 'option_code', colorObj['-code']);
+		// <option_swatch></option_swatch>
+		insertTextElement(order_option, 'option_name', colorObj['-name']);
+		// <order_quantity/> mashnaviでは未設定？
+		insertTextElement(order_option, 'order_quantity', null);
+		// <option_image>
+		insertTextElement(order_option, 'option_image', option_image);
+		// <unit_price></unit_price>
+		insertTextElement(order_option, 'unit_price', total_amount);
+		// <tax></tax>
+		insertTextElement(order_option, 'tax', total_tax);
+		// </order_option> 終了
+		// </item> 終了
+		// </order_options> 終了
+		// <under_crotch></under_crotch>
+		if (mata !=null && Number(mata) > 0)
+			insertTextElement(order_bill, 'under_crotch', mata);
+		// </order_bill> 終了
+		// </order> 終了
+
+		return orderXML;
+	}
+
+	function insertTextElement(xmlobj, name, value)
+	{
+		var elem = root.createElement(name);
+		if (value != null)
+			elem.appendChild(root.createTextNode(value));
+		xmlobj.appendChild(elem);
+
+		return elem;
+	}
+	function insertElement(xmlobj, name)
+	{
+		var elem = root.createElement(name);
+		xmlobj.appendChild(elem);
+
+		return elem;
+	}
 }
 
 function selectParts(pbasket, opt, code, mode)
@@ -959,4 +1255,5 @@ function refreshParts(pbasket)
 		selectParts(pbasket, layobj.opt, layobj.partsCode, '');
 	}
 }
+
 -->
