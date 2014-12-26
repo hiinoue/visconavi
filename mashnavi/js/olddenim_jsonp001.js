@@ -3,6 +3,62 @@
 
 var basket = null;
 var json_root = null;
+var current_page = 0;
+
+const page_selspec = 0;
+const page_selway = 1;
+const page_selsize = 2;
+const max_page = 3;
+
+
+var specarray = [{description: ['ゴルフパンツ', 'メンズ'], config: 'catalog/MashNaviItem_golf.js', img: 'catalog/thumbnail/golf.png'}, 
+		 {description: ['デニムナビ', 'レディースフラット'], config: 'catalog/MashNaviItem_mobile.js'}
+		];
+
+function select_spec()
+{
+	setPage(current_page);
+	alert('select_spec() browser=' + navigator.appName + ' agent=' + navigator.userAgent + ' version=' + navigator.appVersion);
+
+	fileSystemApiTest();
+	alert('canvas.toDataURL=' + document.createElement('canvas').toDataURL('image/jpeg').indexOf('data:image/jpeg'));
+
+	var hlist_spec = document.getElementById('speclist');
+	displaySpecList(hlist_spec, specarray);
+
+	var today = new Date();
+	var orderdate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+	var timestamp = today.getTime();
+	var urlfile_dateget = 'http://www.customOrder.jp/CreateDeliveryDate.action?orderDate=' + orderdate + '&timestamp=' + timestamp;
+	console.log('urlfile_dateget=' + urlfile_dateget);
+	$.ajax({
+		url: urlfile_dateget,
+		type: 'get',
+		dataType: 'xml'
+		})
+	  .then(function(data, status) {
+		//alert('ok');
+		var order = data.getElementsByTagName('Order');
+		var deliveryDate = order[0].getAttribute('deliveryDate');
+		alert('納期=' + deliveryDate);
+	    })
+	  .fail(function(jqXHR, status, errorThrown) {
+		alert('エラー発生 status=' + status + ',' + jqXHR.responseText + ':' + errorThrown);
+	    });
+
+	/**
+	var jsonfile = 'catalog/MashNaviItem_mobile.js';
+	jsonp_connect(jsonfile);
+	**/
+}
+
+function chSpecImg(node)
+{
+	var jsonfile = specarray[Number(node.name)].config;
+	setPage(page_selway);
+	jsonp_connect(jsonfile);
+}
+
 
 function handle_json(jsondata)
 {
@@ -24,15 +80,17 @@ function handle_json(jsondata)
 		alert('jsondata == null');
 		return;
 	}
+	if (basket != null)
+		basket.clear();
 	basket = new Basket(jsondata);
 	// basket.jsonroot = jsondata;
 	var canvas = document.getElementById('front');
 	var context = canvas.getContext('2d');
-	basket.set_canvas_front(canvas, context);						
+	basket.set_canvas_front(canvas, context);
 	//オンライン描画コンテキストの取得
 	canvas = document.getElementById('back');
 	context = canvas.getContext('2d');
-	basket.set_canvas_back(canvas, context);						
+	basket.set_canvas_back(canvas, context);
 	//alert('canvas_back=' + basket.get_canvas_back());
 	//オフライン描画コンテキストの取得
 	canvas = document.getElementById('offline');
@@ -45,6 +103,13 @@ function handle_json(jsondata)
 	hlist_matashita = document.getElementById('matashita');
 	hlist_opt = document.getElementById('optlist');
 	hlist_parts = document.getElementById('partslist');
+	// クリア
+	clearDisplayList(hlist_item);
+	clearDisplayList(hlist_color);
+	clearDisplayList(hlist_size);
+	// clearDisplayList(hlist_matashita);
+	clearDisplayList(hlist_opt);
+	clearDisplayList(hlist_parts);
 
 	displayItemList(hlist_item, basket.getItemCache());
 }
@@ -119,19 +184,14 @@ function fileSystemApiTest()
 	}
 }
 
-function jsonp_connect()
+function jsonp_connect(jsonfile)
 {
-	alert('jsonp_connect() browser=' + navigator.appName + ' agent=' + navigator.userAgent + ' version=' + navigator.appVersion);
-
-	fileSystemApiTest();
-	alert('canvas.toDataURL=' + document.createElement('canvas').toDataURL('image/jpeg').indexOf('data:image/jpeg'));
 	var local = true;
 	var via_script = true;
 	// alert('jsonp_connect local=' + local + ' via_script=' + via_script);
 	//オンライン描画コンテキストの取得
 	// cacheprogress.addEvent( window, 'load', cacheprogress.initialize );
 
-	var jsonfile = 'catalog/MashNaviItem_mobile.js';
 	if (!local)
 		jsonfile = 'http://192.168.0.128/mashnavi/' + jsonfile;
 
@@ -219,55 +279,75 @@ function handleOpts(event)
 	displayOptParts(newIndex);
 }
 
+function setPage(page)
+{
+	current_page = page;
+	var selSpec = document.getElementById('selectSpec');
+	var selSize = document.getElementById('selectSize');
+	var simu = document.getElementById('simulation');
+	var waydiv = document.getElementById('waydiv');
+	var opttab = document.getElementById('opttab');
+	var partstab = document.getElementById('partstab');
+	var szdata = document.getElementById('SizeData');
+	var prev = document.getElementById('prev');
+	var next = document.getElementById('next');
+	switch (page)
+	{
+		case 0:
+			prev.style.display = 'none';
+			next.style.display = 'none';
+			selSpec.style.display = 'inline';
+			simu.style.display = 'none';
+ 			// selSize.style.zIndex = '-1';
+			szdata.style.display = 'none';
+			break;
+		case 1:
+			prev.style.display = 'inline';
+			next.style.display = 'inline';
+			selSpec.style.display = 'none';
+			simu.style.display = 'inline';
+			waydiv.style.display = 
+			opttab.style.display = 
+			partstab.style.display = 'inline';
+ 			// selSize.style.zIndex = '-1';
+			szdata.style.display = 'none';
+			break;
+		case 2:
+			prev.style.display = 'inline';
+			next.style.display = 'inline';
+			selSpec.style.display = 'none';
+			simu.style.display = 'inline';
+			waydiv.style.display = 
+			opttab.style.display = 
+			partstab.style.display = 'none';
+ 			selSize.style.zIndex = '3';
+			szdata.style.display = 'inline';
+			break;
+		case 3:
+			prev.style.display = 'inline';
+			next.style.display = 'none';
+			selSpec.style.display = 'none';
+			simu.style.display = 'none';
+ 			selSize.style.zIndex = '3';
+			szdata.style.display = 'inline';
+			break;
+	}
+}
+
 function prevPage(event)
 {
-	var selSize = document.getElementById('selectSize');
-	var zidx = Number(selSize.style.zIndex);
-	if (zidx > 0)
-	{
-		var prev = document.getElementById('prev');
- 		selSize.style.zIndex = '-1';
-		prev.style.display = 'none';
-		
-		var szdata = document.getElementById('SizeData');
-		szdata.style.display = 'none';
-		var simu = document.getElementById('simulation');
-		simu.style.display = 'inline';
-	}
+	if (Number(current_page) <= 0)
+		return;
+	setPage(Number(current_page) - 1);
 }
 
 function nextPage(event)
 {
-	var selSize = document.getElementById('selectSize');
-	/**
-	var selParts = document.getElementById('selectParts');
-	if (selParts)
-	{	
-		//alert('selParts=' + selSize.style.width + 'x' + selSize.style.height);
-		selSize.style.width = selParts.style.width;
-		selSize.style.height = selParts.style.height;
-	}
-	***/
-	var zidx = Number(selSize.style.zIndex);
-	if (zidx <= 0)
-	{
-		jscache = basket.jscache;
-
-		var prev = document.getElementById('prev');
- 		selSize.style.zIndex = '3';
-		itemObj = basket.getItem();
-		var sizeArray = jscache.makeSizeArray(itemObj);
-		displaySizeList(hlist_size, sizeArray);
-		// displayMatashitaList(hlist_matashita);
-		displayMatashitaSlider(hlist_matashita);
-		prev.style.display = 'inline';
-
-		var szdata = document.getElementById('SizeData');
-		szdata.style.display = 'inline';
-		var simu = document.getElementById('simulation');
-		simu.style.display = 'none';
+	if (Number(current_page) >= Number(max_page))
 		return;
-	}
+	setPage(Number(current_page) + 1);
+	if (Number(current_page) < Number(max_page))
+		return;
 
 	if (basket.curColor == null)
 	{
@@ -363,7 +443,7 @@ function nextPage(event)
 	  .then(function(data, status) {
 		if (!canceled)
 			alert('upload応答=' + data);
-		prevPage(event);
+		setPage(0);
 	    })
 	  .fail(function(jqXHR, status, errorThrown) {
 		alert('エラー発生 no_get=' + no_get + ':' + status + ',' + jqXHR.responseText);

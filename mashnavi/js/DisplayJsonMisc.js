@@ -14,9 +14,71 @@ var optIndexSelected = -1;
 var hlist_parts = null;
 var partsIndexSelected = -1;
 
+function clearDisplayList(ilist)
+{
+	while (ilist.firstChild) {
+		ilist.removeChild(ilist.firstChild);
+	}
+}
+
+function displaySpecList(ispeclist, specarray)
+{
+	if (ispeclist == null)
+		return;
+	clearDisplayList(ispeclist);
+	if (specarray == null)
+		return;
+	var specObj;
+	// alert('displaySpecList specarray.length=' + specarray.length);
+	for (var i = 0; i < specarray.length; i++)
+	{
+		var specObj = specarray[i];
+		var trelem = document.createElement('tr');
+		ispeclist.appendChild(trelem);
+		var tdelem = document.createElement('td');
+		trelem.appendChild(tdelem);
+		var figelem = document.createElement('figure');
+		figelem.name = i;
+		figelem.style.margin = '0';
+		/** appendChildの順序を変える事によりfigcaptionとimgの表示順も変わる
+		if (specObj.img != null)
+		{
+			var imgelem = new Image();
+			imgelem.src = specObj.img;
+			figelem.appendChild(imgelem);
+		}
+		**/
+		tdelem.appendChild(figelem);
+		var capelem = document.createElement('figcaption');
+		var desc_array = specObj.description;
+		for (var j = 0; j < desc_array.length; j++)
+		{
+			if (j != 0)
+				capelem.appendChild(document.createElement('br'));
+			capelem.appendChild(document.createTextNode(desc_array[j]));
+		}
+		figelem.appendChild(capelem);
+		//
+		// appendChildの順序を変える事によりfigcaptionとimgの表示順も変わる
+		//	この場合はcaptionが上になる
+		if (specObj.img != null)
+		{
+			var imgelem = document.createElement('img');
+			imgelem.src = specObj.img;
+			figelem.appendChild(imgelem);
+		}
+		figelem.setAttribute('onClick', 'chSpecImg(this)');
+		// alert('displaySpecList ' + i);
+	}
+}
+
 function displayItemList(iitemlist, itemarray)
 {
-	curItemIndex = -1;
+	if (iitemlist == null)
+		return;
+	clearDisplayList(iitemlist);
+	if (itemarray == null)
+		return;	curItemIndex = -1;
 	// alert('length2=' + children.length);
 	for (var i = 0; i < itemarray.length; i++)
 	{
@@ -40,7 +102,7 @@ function displayColorList(icolorlist, colorarray)
 	var rowPerType = true;
 	var tType = null, type;
 	var trelem;
-	while (icolorlist.children.length > 0) icolorlist.removeChild(icolorlist.children[0]);
+	clearDisplayList(icolorlist);
 	colorIndexSelected = -1;
 	for (i = 0; i < colorarray.length; i++)
 	{
@@ -53,6 +115,9 @@ function displayColorList(icolorlist, colorarray)
 				trelem = document.createElement('tr');
 				icolorlist.appendChild(trelem);
 				tType = type;
+				var thelem = document.createElement('th');
+				thelem.appendChild(document.createTextNode(type['-name']));
+				trelem.appendChild(thelem);
 			}
 		}
 		else
@@ -65,14 +130,14 @@ function displayColorList(icolorlist, colorarray)
 		var figelem = document.createElement('figure');
 		figelem.style.margin = '0';
 		tdelem.appendChild(figelem);
-		var capelem = document.createElement('figcaption');
-		capelem.appendChild(document.createTextNode(color['-name']));
-		figelem.appendChild(capelem);
 		var imgelem = document.createElement('img');
 		imgelem.src = color['-url'];
 		imgelem.alt = i;
 		imgelem.setAttribute('onClick', 'chColImg(this)');
 		figelem.appendChild(imgelem);
+		var capelem = document.createElement('figcaption');
+		capelem.appendChild(document.createTextNode(color['-name']));
+		figelem.appendChild(capelem);
 	}
 }
 
@@ -80,7 +145,7 @@ function displayOptList(ioptlist, optarray)
 {
 	if (ioptlist == null)
 		return;
-	while (ioptlist.children.length > 0) ioptlist.removeChild(ioptlist.children[0]);
+	clearDisplayList(ioptlist);
 	optIndexSelected = -1;
 	if (optarray == null)
 		return;
@@ -155,7 +220,7 @@ function displayPartsList(ipartslist, partsarray)
 {
 	if (ipartslist == null)
 		return;
-	while (ipartslist.children.length > 0) ipartslist.removeChild(ipartslist.children[0]);
+	clearDisplayList(ipartslist);
 	partsIndexSelected = -1;
 	if (partsarray == null)
 		return;
@@ -192,7 +257,7 @@ function displaySizeList(isizelist, sizearray)
 {
 	if (isizelist == null)
 		return;
-	while (isizelist.children.length > 0) isizelist.removeChild(isizelist.children[0]);
+	clearDisplayList(isizelist);
 	sizeIndexSelected = -1;
 	if (sizearray == null)
 		return;
@@ -233,7 +298,7 @@ function displayMatashitaList(imatashitalist)
 {
 	if (imatashitalist == null)
 		return;
-	while (imatashitalist.children.length > 0) imatashitalist.removeChild(imatashitalist.children[0]);
+	// clearDisplayList(imatashitalist);
 	if (matashitaArray == null)
 	{
 		imatashitalist.style.visibility = 'hidden';

@@ -1,6 +1,21 @@
 <!--
 // Basket.js
 var Basket = function(jsondata) {
+	this.canvas_front = null;
+	this.canvas_back = null;
+	this.clear();
+
+	this.jsonroot = jsondata;
+	if (jsondata != null)
+		this.jscache = new NaviCacheHolder(jsondata);
+}
+
+Basket.prototype.clear = function() {
+	// 残っているcanvasイメージをクリア
+	if (this.canvas_front != null)
+		this.context_front.clearRect(0, 0, this.canvas_front.width, this.canvas_front.height);
+	if (this.canvas_back != null)
+		this.context_back.clearRect(0, 0, this.canvas_back.width, this.canvas_back.height);
 	// 現在の選択内容
 	this.curItem = null; // Item object
 	this.curType = null; // Type object
@@ -34,11 +49,7 @@ var Basket = function(jsondata) {
 	this.base = {};	// ベース images
 
 	this.jscache = null;
-	this.jsonroot = jsondata;
-	if (jsondata != null)
-		this.jscache = new NaviCacheHolder(jsondata);
 }
-
 //
 //	Basket class method
 //
@@ -752,6 +763,7 @@ Basket.prototype.ItemToXML = function(orderNo)
 	var colorObj = this.curColor;
 	var sizeObj = this.curSize;
 	var mata = this.curMatashita;
+	var parts_specs = this.partsarray;
 
 	// 暫定的 ナビ共通
 	var shopid = '0';
@@ -894,11 +906,11 @@ Basket.prototype.ItemToXML = function(orderNo)
 		insertTextElement(order_option, 'option_image', color_image);
 		// </order_option> 終了
 		// </item> ベースカラー 終了
-		var plen = this.partsarray.length;
+		var plen = parts_specs.length;
 		var layobj;
 		for (var i = 0; i < plen; i++)
 		{
-			layobj = this.partsarray[i];
+			layobj = parts_specs[i];
 		}
 
 		return orderXML;
@@ -1214,7 +1226,7 @@ function dress(pbasket) {
 			}
 			fimg.onerror = function() {
 				pbasket.base.fimage = null;
-				alert.log('base image load error:' + this.colfile);
+				alert('base image load error:' + this.colfile);
 				pbasket.redraw(true);
 			}
 			fimg.src = color_f;

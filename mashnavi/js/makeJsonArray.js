@@ -172,7 +172,12 @@ NaviCacheHolder.prototype.setItemNo = function(basket, itemno) {
 				optemp = optslist;
 		}
 		if (optemp != null)
-			return optemp.option;
+		{
+			if (Array.isArray(optemp.option))
+				return optemp.option;
+			else
+				return [optemp.option];
+		}
 		else
 			return null;
 	}
@@ -250,7 +255,10 @@ NaviCacheHolder.prototype.makeSizeArray = function(itemObj)
 		}
 		//alert('matashitaArray len=' + this.matashitaArray.length);
 	}
-	return sizetemp.Size;
+	if (Array.isArray(sizetemp.Size))
+		return sizetemp.Size;
+	else
+		return [sizetemp.Size];
 }
 
 -->
