@@ -11,13 +11,16 @@ const page_selsize = 2;
 const max_page = 3;
 
 
-var specarray = [{description: ['ゴルフパンツ', 'メンズ'], config: 'catalog/MashNaviItem_golf.js', img: 'catalog/thumbnail/golf.png'}, 
-		 {description: ['デニムナビ', 'レディースフラット'], config: 'catalog/MashNaviItem_mobile.js'}
+var specarray = [{description: ['ゴルフパンツ', 'メンズ'], config: 'catalog/MashNaviItem_golf.js', img: 'catalog/Thumbnail/golf.png'}, 
+		 {description: ['デニムナビ', 'レディースフラット'], config: 'js/MashNaviItem_mobile.js'}
 		];
+
+var deliveryDate;
 
 function select_spec()
 {
 	setPage(current_page);
+	deliveryDate = null;
 	alert('select_spec() browser=' + navigator.appName + ' agent=' + navigator.userAgent + ' version=' + navigator.appVersion);
 
 	fileSystemApiTest();
@@ -38,8 +41,10 @@ function select_spec()
 		})
 	  .then(function(data, status) {
 		//alert('ok');
-		var order = data.getElementsByTagName('Order');
-		var deliveryDate = order[0].getAttribute('deliveryDate');
+		/* var order = data.getElementsByTagName('Order');
+		replyDate = order[0].getAttribute('deliveryDate'); */
+		var replyDate = data.documentElement.getAttribute('deliveryDate');
+		deliveryDate = replyDate.replace(/\//g, '-'); // 年月日の区切りを/から-に替える
 		alert('納期=' + deliveryDate);
 	    })
 	  .fail(function(jqXHR, status, errorThrown) {
@@ -69,6 +74,7 @@ function handle_json(jsondata)
 			+ ' MozRequestFileSystem=' + typeof(window.MozRequestFileSystem)
 			+ ' MSRequestFileSystem=' + typeof(window.MSRequestFileSystem));
 	**/
+	// alert("jsondata=" + jsondata.toSource());
 	json_root = jsondata;
 	if (json_root == undefined)
 	{
@@ -359,13 +365,25 @@ function nextPage(event)
 		alert('サイズ未入力！！！');
 		return;
 	}
+	const local_test = false;
 	var no_get;
 	var navitype = (basket.curPartsTemplate != null ? 'PN' : 'MN');
-	var urlfile_noget = 'http://192.168.0.128/scripts/BottomsOrderno.aspx?navitype=' + navitype + '&machineId=00';
-	var urlfile = 'http://192.168.0.128/scripts/BottomsOrder.aspx';
+	var urlfile_noget;
+	var urlfile;
+	if (local_test) { // ローカルサーバー
+		urlfile_noget = 'http://192.168.0.128/scripts/BottomsOrderno.aspx';
+		urlfile = 'http://192.168.0.128/scripts/BottomsOrder.aspx';
+	} else if (navitype == 'PN') {
+		urlfile_noget = 'http://www.customorder.jp/CreatePantsOrderNumber.action';
+		urlfile = 'http://www.customOrder.jp/PantsOrderAccept_Upload.action';
+	} else {
+		urlfile_noget = 'http://www.customOrder.jp/CreateMashOrderNumber.action';
+		urlfile = 'http://www.customOrder.jp/MashOrderAccept_Upload.action';
+	}
+	urlfile_noget += ('?navitype=' + navitype + '&machineId=0');
 	var use_gui_form = false; // true/false何れでもOK。blobを使用しておりそのためmultipart/form-dataが
 				  // 自然に設定されると思われる。
-	var upload_add = false;
+	var upload_add = (navitype == 'PN');
 	var use_bbuilder = false;
 	var canceled = false;
 	var BBuilder;
@@ -390,45 +408,46 @@ function nextPage(event)
 		dataType: 'xml'
 		})
 	  .then(function(data, status) {
-		var order = data.getElementsByTagName('order');
-		var orderno = order[0].getAttribute('orderNumber');
+		/*var order = data.getElementsByTagName('order');
+		var orderelem;
+		if (order.length > 0) {
+			orderelem = order[0];*/
+		var orderno = data.documentElement.getAttribute('orderNumber');
 		if (!window.confirm('注文№は' + orderno + ' 注文しますか？'))
 		{
 			canceled = true;
 			return;
 		}
 
-		no_get = false;
-		var orderXML = basket.ItemToXML(orderno);
-		var para_data = [(new XMLSerializer()).serializeToString(orderXML)]; /* 
-			['<order><order_no xmlns="http://www.w3.org/1999/xhtml">PN000099</order_no><order_date xmlns="http://www.w3.org/1999/xhtml"></order_date><shopid xmlns="http://www.w3.org/1999/xhtml">0</shopid><test_card_flag xmlns="http://www.w3.org/1999/xhtml">false</test_card_flag><user_name1 xmlns="http://www.w3.org/1999/xhtml"></user_name1><user_name1 xmlns="http://www.w3.org/1999/xhtml"></user_name1><total_amount xmlns="http://www.w3.org/1999/xhtml">14800</total_amount><total_tax xmlns="http://www.w3.org/1999/xhtml">1184</total_tax><avatar_front xmlns="http://www.w3.org/1999/xhtml"></avatar_front><avatar_back xmlns="http://www.w3.org/1999/xhtml"></avatar_back><custom_give_date xmlns="http://www.w3.org/1999/xhtml"></custom_give_date><express_flag xmlns="http://www.w3.org/1999/xhtml">0</express_flag><custom_flag xmlns="http://www.w3.org/1999/xhtml">0</custom_flag><order_bill xmlns="http://www.w3.org/1999/xhtml"><item_number>MASHNAVI-11</item_number><item_name>Ｕネックチュニック</item_name><item_type></item_type><item_type_name>ナスタチウム</item_type_name><detail></detail><detail_name>GR</detail_name><nbs_code>xxxxxxx</nbs_code><nbs_size_code>XX</nbs_size_code><nbs_color_code>XX</nbs_color_code><fabric_code>M4206-2B-MN</fabric_code><fabric_width>1440</fabric_width><fabric_height>1980</fabric_height><item_image_front></item_image_front><item_image_back></item_image_back><size_text>11</size_text><unit_price>14800</unit_price><tax>1184</tax><order_quantity>1</order_quantity><order_options><item><order_option><option_number>1</option_number><layout_flag>true</layout_flag><layout_order>0</layout_order><design_code>GM0003</design_code><design_name>ナスタチウム</design_name><option_code>GR</option_code><option_name>01</option_name><order_quantity></order_quantity><unit_price>14800</unit_price><tax>1184</tax></order_option></item></order_options><under_crotch>-1</under_crotch></order_bill></order>']; */
+		basket.invokeAFunctionAfterGeneratingBase64data('image/png', function(base64dt) {
+		 	var orderXML = basket.ItemToXML(orderno, deliveryDate, base64dt);
+			var para_data = [(new XMLSerializer()).serializeToString(orderXML)];
+			// console.log(para_data);
+			var oMyForm;
+			var oMyBlob;
+			if (use_bbuilder)
+			{
+				var BBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
+				var bb = new BBuilder();
+				bb.append(para_data);
+				oMyBlob = bb.getBlob('text/xml');
+			}
+			else
+				oMyBlob = new Blob(para_data, {type : 'text/xml'}); // the blob
+			if (use_gui_form)
+			{
+				$form = $('#upload-form');
+       				oMyForm = new FormData($form[0]);
+			}
+			else
+				oMyForm = new FormData();
 
-		// console.log(para_data);
-		var oMyForm;
-		var oMyBlob;
-		if (use_bbuilder)
-		{
-			var BBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
-			var bb = new BBuilder();
-			bb.append(para_data);
-			oMyBlob = bb.getBlob('text/xml');
-		}
-		else
-			oMyBlob = new Blob(para_data, {type : 'text/xml'}); // the blob
-		if (use_gui_form)
-		{
-			$form = $('#upload-form');
-       			oMyForm = new FormData($form[0]);
-		}
-		else
-			oMyForm = new FormData();
-
-		if (upload_add)
-			oMyForm.append('FileName', orderno + '.xml');
-		oMyForm.append('orderData', oMyBlob, orderno + '.xml');
-		if (upload_add)
-			oMyForm.append('Upload', 'Submit Query');
-		return $.ajax({
+			if (upload_add)
+				oMyForm.append('FileName', orderno + '.xml');
+			oMyForm.append('orderData', oMyBlob, orderno + '.xml');
+			if (upload_add)
+				oMyForm.append('Upload', 'Submit Query');
+			$.ajax({
 				url: urlfile,
 				type: 'post',
 				processData: false,
@@ -438,15 +457,25 @@ function nextPage(event)
 				// headers: {'Content-Type' : 'multipart/form-data; boundary=axbygd'}, // contentTypeと同様
 				dataType: 'text',
 				data: oMyForm
-			});
+				})
+		  	  .then(function(data, status) {
+				alert('upload応答=' + data);
+				setPage(0);
+		    	    })
+		  	  .fail(function(jqXHR, status, errorThrown) {
+				alert('注文データ送信エラー:' + status + ',' + jqXHR.responseText);
+		    	    });
+		});
 	    })
+	  /****
 	  .then(function(data, status) {
 		if (!canceled)
 			alert('upload応答=' + data);
 		setPage(0);
 	    })
+	  ****/
 	  .fail(function(jqXHR, status, errorThrown) {
-		alert('エラー発生 no_get=' + no_get + ':' + status + ',' + jqXHR.responseText);
+		alert('注文№取得でエラー発生:' + status + ',' + jqXHR.responseText);
 	    });
 }
 

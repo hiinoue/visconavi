@@ -16,6 +16,8 @@ Basket.prototype.clear = function() {
 		this.context_front.clearRect(0, 0, this.canvas_front.width, this.canvas_front.height);
 	if (this.canvas_back != null)
 		this.context_back.clearRect(0, 0, this.canvas_back.width, this.canvas_back.height);
+	this.wk_canvas = null;
+	this.base64array = [];
 	// 現在の選択内容
 	this.curItem = null; // Item object
 	this.curType = null; // Type object
@@ -179,7 +181,7 @@ Basket.prototype.makePartsArray = function(optarray, partsTemplate)
 		layobj = {};
 		layobj.opt = layer['-code'];
 		layobj.optobj = layer;
-		layobj.name = layer['-name'];
+		layobj.optname = layer['-name'];
 		layobj.dress = layer['-dress'];
 		this.partsarray.push(layobj);
 		selpart = layer['-force'];
@@ -349,6 +351,7 @@ Basket.prototype.redraw = function(ifPending) {
 		}
 
 		var use_offline = false;
+		var fill_white = true;
 		if (pbasket.partsarray.length > 0 ||
 		    pbasket.silarray.length > 0)
 			use_offline = true;
@@ -394,20 +397,26 @@ Basket.prototype.redraw = function(ifPending) {
 			posy = (canvas.height - tgt_height) / 2;
 		}
 
+		// 背景塗りつぶし
+		if (fill_white) { // 透明な黒ではなく不透明な白で塗りつぶす?
+			context.fillStyle = 'rgb(255, 255, 255)';
+			context.fillRect(0, 0, canvas.width, canvas.height);
+		} else { //  透明な黒でクリアする？
+			context.clearRect(0, 0, canvas.width, canvas.height);
+		}
 		if (use_offline)
 		{
+			offimg = pbasket.offimage;
 			// canvas.width =
-			pbasket.offimage.width = tgt_width; // imgwdt;
+			offimg.width = tgt_width; // imgwdt;
 			// canvas.height =
-			pbasket.offimage.height = tgt_height; // imghgt;
+			offimg.height = tgt_height; // imghgt;
 
-			if (baseimg != null)	
+			pbasket.offctx.fillStyle = 'rgb(255, 255, 255)';
+			pbasket.offctx.fillRect(0, 0, offimg.width, offimg.height);
+			///// pbasket.offctx.clearRect(0, 0, offimg.width, offimg.height);
+			if (baseimg != null)
 				pbasket.offctx.drawImage(baseimg, 0, 0, tgt_width, tgt_height);
-			else
-			{
-				pbasket.offctx.fillStyle = 'rgb(255, 255, 255)';
-				pbasket.offctx.fillRect(0, 0, tgt_width, tgt_height);
-			}
 //alert(' !! 2');
 			for (var i = 0; i < pbasket.partsarray.length; i++)
 			{
@@ -423,7 +432,6 @@ Basket.prototype.redraw = function(ifPending) {
 		}
 		else if (baseimg != null)
 		{
-			context.clearRect(0, 0, canvas.width, canvas.height);
 			context.drawImage(baseimg, posx, posy, tgt_width, tgt_height);
 		}
 
@@ -513,6 +521,7 @@ Basket.prototype.redraw = function(ifPending) {
 		{
 			context.putImageData(basedt, posx, posy);
 		}
+		/****
 		if (whiteBoundary > 0)
 		{
 			context.strokeStyle = '#FFFFFF';
@@ -528,6 +537,7 @@ Basket.prototype.redraw = function(ifPending) {
 				context.stroke();
 			}
 		}
+		****/
 	}
 }
 
@@ -660,37 +670,11 @@ Basket.prototype.setItem = function(item)
 			pbasket.silarray.push(layobj);
 			if (avatarf != null && avatarf != '')
 			{
-				layobj.fimage = nimage = new Image();
-				nimage.crossOrigin = 'anonymous';
-				nimage.silfile = avatarf;
-				nimage.onload = function() {
-					if (typeof(console) != 'undefined')
-						console.log('silhouette front image loaded:' + this.silfile);
-					pbasket.redraw(true);
-				}
-				nimage.onerror = function() {
-					layobj.fimage = null;
-					alert('silhouette image load error:' + this.silfile);
-					pbasket.redraw(true);
-				}
-				nimage.src = avatarf;
+				loadAnImageFile(pbasket, layobj, "fimage", avatarf, false, 'front silhouette image');
 			}
 			if (avatarb != null && avatarb != '')
 			{
-				layobj.bimage = nimage = new Image();
-				nimage.crossOrigin = 'anonymous';
-				nimage.silfile = avatarb;
-				nimage.onload = function() {
-					if (typeof(console) != 'undefined')
-						console.log('silhouette back image loaded:' + this.silfile)
-					pbasket.redraw(true);
-				}
-				nimage.onerror = function() {
-					layobj.bimage = null;
-					alert('silhouette image load error:' + this.silfile);
-					pbasket.redraw(true);
-				}
-				nimage.src = avatarb;
+				loadAnImageFile(pbasket, layobj, "bimage", avatarb, false, 'back silhouette image');
 			}
 		}
 	}
@@ -755,7 +739,7 @@ Basket.prototype.SelectParts = function(opt, code)
 	return selectParts(this, opt, code, 'toggle');
 }
 
-Basket.prototype.ItemToXML = function(orderNo)
+Basket.prototype.ItemToXML = function(orderNo, deliveryDate, base64array)
 {
 	var root = $.parseXML('<order></order>');
 	var itemObj = this.curItem;
@@ -764,38 +748,64 @@ Basket.prototype.ItemToXML = function(orderNo)
 	var sizeObj = this.curSize;
 	var mata = this.curMatashita;
 	var parts_specs = this.partsarray;
+	// 注文日
+	var today = new Date();
+	var dayOfMonth = today.getDate();
+	var order_date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + dayOfMonth;
+	// 納期
+	var custom_give_date = deliveryDate;
+	if (custom_give_date == null) {
+		today.setDate(dayOfMonth + 14);
+		custom_give_date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+	}
 
-	// 暫定的 ナビ共通
+	// 暫定値 ナビ共通
 	var shopid = '0';
-	var order_date = null;
+	var test_card_flag = false;
 	var user_name1 = null;
 	var user_name2 = null;
-	var custom_give_date = null;
 	var express_flag = 0;
-	var test_card_flag = 'false';
 	var custom_flag = 0;
-	var color_image = null;
+
+	// ベースカラーイメージ
+	var color_image = base64array[0].data;
+
+	// avatar_front(back)の取得用const
+	const MIMEtype = 'image/jpeg';
+	const URIhead = 'data:' + MIMEtype;
 
 	var orderXML = $(root).find('order')[0];
 
 	if (orderNo.substr(0, 2) == 'PN')
-		return DenimNaviItemToXML(orderNo);
+		return DenimNaviItemToXML(orderNo, base64array);
 	else
 		return MashNaviItemToXML(orderNo);
 
-	function DenimNaviItemToXML(orderNo)
+	function DenimNaviItemToXML(orderNo, base64array)
 	{
-		// 暫定的
-		var total_amount = sizeObj['-price'];
-		var total_tax = total_amount * 0.08;
-		var avatar_front = null;
-		var avatar_back = null;
+		// 暫定値　デニムナビ固有
+		var total_amount = sizeObj['-price']; // オプション価格の上乗せが必要
+		var tax_rate = 0.08;
 		var nbs_code = 'xxxxxxx';
 		var nbs_size_code = 'XX';
 		var nbs_color_code = 'XX';
 		var fabric_width = sizeObj['-width'];
 		var fabric_height = sizeObj['-height'];
-		var option_image = null;
+		var base_file_name = null;
+
+		// avatar_front(back)の取得
+		var dataurl;
+		// avatar_front
+		dataurl = document.getElementById('front').toDataURL(MIMEtype);
+		if (dataurl.indexOf(URIhead) < 0)
+		{
+			alert('このブラウザではjpegデータに変換できません');
+			return;
+		}
+		var avatar_front = dataurl.replace(URIhead + ';base64,', '');
+		// avatar_back
+		dataurl = document.getElementById('back').toDataURL(MIMEtype);
+		var avatar_back = dataurl.replace(URIhead + ';base64,', '');
 
 		// order_no
 		insertTextElement(orderXML, 'order_no', orderNo);
@@ -812,6 +822,7 @@ Basket.prototype.ItemToXML = function(orderNo)
 		// total_amount
 		insertTextElement(orderXML, 'total_amount', total_amount);
 		// total_tax
+		var total_tax = total_amount * tax_rate;
 		insertTextElement(orderXML, 'total_tax', total_tax);
 		// avatar_front
 		insertTextElement(orderXML, 'avatar_front', avatar_front);
@@ -829,13 +840,16 @@ Basket.prototype.ItemToXML = function(orderNo)
 		insertTextElement(order_bill, 'item_number', itemObj['-code']);
 		// <item_code></item_code>
 		insertTextElement(order_bill, 'item_code', nbs_code + '-' + nbs_size_code + '-' + nbs_color_code);
-		// <item_type>7</item_type>
+		// <item_type></item_type>
+		insertTextElement(order_bill, 'item_type', itemObj['-silhouette']);
 		// <item_type_name></item_type_name>
 		insertTextElement(order_bill, 'item_type_name', itemObj['-name']);
 		// <spec>1</spec>
+		insertTextElement(order_bill, 'spec', itemObj['-spec']);
+		// <detail></detail>
 		insertTextElement(order_bill, 'detail', typeObj['-code']);
 		// <detail_name></detail_name>
-		insertTextElement(order_bill, 'detail_name', colorObj['-name']);
+		insertTextElement(order_bill, 'detail_name', typeObj['-name']);
 		// <fabric_code></fabric_code>
 		insertTextElement(order_bill, 'fabric_code', itemObj.Fablic['-code']);
 		// <fabric_width></fabric_width>
@@ -864,16 +878,15 @@ Basket.prototype.ItemToXML = function(orderNo)
 		// <order_options> 開始
 		var option_number = 1;
 		var order_options = insertElement(order_bill, 'order_options');
-		// <item> 開始
 
-		// ベースカラー
+		// ベースカラー <item> 開始
 		var item = insertElement(order_options, 'item');
 	        // <order_option> 開始
  		var order_option = insertElement(item, 'order_option');
 		// <option_number></option_number>
 		insertTextElement(order_option, 'option_number', option_number++);
 		// <layered_order>/layered_order>
-		insertTextElement(order_option, 'layout_order', '0');
+		insertTextElement(order_option, 'layered_order', '0');
 		// <design_type></design_type>
 		insertTextElement(order_option, 'design_type', 'n');
 		// <sew_flag></sew_flag>
@@ -881,17 +894,30 @@ Basket.prototype.ItemToXML = function(orderNo)
 		// <layout_flag></layout_flag>
 		insertTextElement(order_option, 'layout_flag', 'true');
 		// <line_stone_flag></line_stone_flag>
-		insertTextElement(order_option, 'line_stone_sew_flag', 'false');
+		insertTextElement(order_option, 'line_stone_flag', 'false');
 		// <option_type/>
+		insertTextElement(order_option, 'option_type', null);
 		// <option_type_name></option_type_name>
 		insertTextElement(order_option, 'option_type_name', 'ベースカラー');
-		// <option_inner_number>3</option_inner_number>
+		// <option_inner_number></option_inner_number>
+		var base_inner_number = +colorObj['-code']; // 文字列->整数に型変換したものと同じ 今まで例外なし
+		insertTextElement(order_option, 'option_inner_number', base_inner_number);
 		// <option_name></option_name>
 		insertTextElement(order_option, 'option_name', colorObj['-name']);
 		// <option_file_name>PNB37B-A-2</option_file_name>
+		insertTextElement(order_option, 'option_file_name', base_file_name);	// 修正要
 		// <option_layer_name></option_layer_name>
 		insertTextElement(order_option, 'option_layer_name', colorObj['-code']);
 		// <option_swatch>Z-03</option_swatch>
+		var basecolor_swatch = typeObj['-swatchhigh'];
+		if (basecolor_swatch != null) {
+			var swatchlow = colorObj['-swatchlow'];
+			if (swatchlow != null)
+				basecolor_swatch += swatchlow;
+			else
+				basecolor_swatch += colorObj['-code'];
+		}
+		insertTextElement(order_option, 'option_swatch', basecolor_swatch);
 		// <print_pos_x></print_pos_x>
 		insertTextElement(order_option, 'print_pos_x', '0');
 		// <print_pos_y></print_pos_y>
@@ -911,24 +937,144 @@ Basket.prototype.ItemToXML = function(orderNo)
 		for (var i = 0; i < plen; i++)
 		{
 			layobj = parts_specs[i];
+			if (layobj.partsCode == null)
+				continue;
+			// 暫定値
+			var layered_order = 1;
+			var design_type = 'n';
+			var sew_flag = false;
+			var layout_flag = true;
+			var linestone_flag = false;
+			var print_pos_x = 0;
+			var print_pos_y = 0;
+			var option_inner_number = 1;	// 根拠のないダミー設定
+			var option_file_name = null;
+
+			switch (layobj.opt)
+			{
+				case 'DC6':
+					layered_order = 1;
+					break;
+				case 'DC3':
+					layered_order = 2;
+					break;
+				case 'DC1':
+					layered_order = 3;
+					break;
+				case 'DC4':
+					layered_order = 4;
+					print_pos_y = '<div><mul><add><switch id="sitem" vals="13:0/14:32/15:0/16:0/17:32/18:0"/><mul><sub><var id="ucrotch"/><const val="83"/></sub><const val="10"/></mul></add><const val="180"/></mul><const val="25.4"/></div>';
+					break;
+				case 'IN1':
+					layered_order = 5;
+					break;
+				case 'IN2':
+					layered_order = 5;
+					break;
+				case 'STC':
+					layered_order = 5;
+					design_type = null;
+					sew_flag = true;
+					layout_flag = false;
+					break;
+				case 'LNS':
+					layered_order = 6;
+					design_type = null;
+					linestone_flag = true;
+					sew_flag = true;
+					layout_flag = false;
+					break;
+				case 'BTN':
+					layered_order = 7;
+					design_type = null;
+					sew_flag = true;
+					layout_flag = false;
+				case 'URA':
+					layered_order = 8;
+					design_type = 'j';
+					layout_flag = false;
+					break;
+				case 'DC5':
+					layered_order = 9;
+					break;
+			}
+			// 各オプション <item> 開始
+			item = insertElement(order_options, 'item');
+	        	// <order_option> 開始
+ 			order_option = insertElement(item, 'order_option');
+			// <option_number></option_number>
+			insertTextElement(order_option, 'option_number', option_number++);
+			// <layered_order>/layered_order>
+			insertTextElement(order_option, 'layered_order', layered_order);
+			// <design_type></design_type>
+			insertTextElement(order_option, 'design_type', design_type);
+			// <sew_flag></sew_flag>
+			insertTextElement(order_option, 'sew_flag', sew_flag);
+			// <layout_flag></layout_flag>
+			insertTextElement(order_option, 'layout_flag', layout_flag);
+			// <line_stone_flag></line_stone_flag>
+			insertTextElement(order_option, 'line_stone_flag', linestone_flag);
+			// <option_type/>
+			var optstr = layobj.opt;
+			insertTextElement(order_option, 'option_type', optstr);
+			// <option_type_name></option_type_name>
+			insertTextElement(order_option, 'option_type_name', layobj.optname);
+			// <option_inner_number>3</option_inner_number>
+			insertTextElement(order_option, 'option_inner_number', option_inner_number);
+			// <option_name></option_name>
+			insertTextElement(order_option, 'option_name', layobj.partsObj['-name']);
+			if (layout_flag) {
+				// <option_file_name>PNB37B-A-2</option_file_name>
+				insertTextElement(order_option, 'option_file_name', option_file_name);
+			}
+			// <option_layer_name></option_layer_name>
+			insertTextElement(order_option, 'option_layer_name', layobj.partsCode);
+			// <option_swatch></option_swatch>
+			insertTextElement(order_option, 'option_swatch', layobj.partsObj['-swatch']);
+			// <print_pos_x></print_pos_x>
+			insertTextElement(order_option, 'print_pos_x', print_pos_x);
+			// <print_pos_y></print_pos_y>
+			insertTextElement(order_option, 'print_pos_y', print_pos_y);
+			// <unit_price></unit_price>
+			var unit_price = layobj.partsObj['-tanka'];
+			insertTextElement(order_option, 'unit_price', unit_price);
+			// <tax></tax>
+			insertTextElement(order_option, 'tax', unit_price * tax_rate);
+			// <order_quantity></order_quantity>
+			insertTextElement(order_option, 'order_quantity', '1');
+			// <option_image>
+			insertTextElement(order_option, 'option_image', base64array[i + 1].data);
 		}
+
+		// <order_options> 終了
 
 		return orderXML;
 	}
 
-	function MashNaviItemToXML(orderNo)
+	function MashNaviItemToXML(orderNo, base64array)
 	{
-		// 暫定的
-		var total_amount = sizeObj['-price'];
-		var total_tax = total_amount * 0.08;
-		var avatar_front = null;
-		var avatar_back = null;
+		// 暫定値　マッシュナビ固有
+		var total_amount = sizeObj['-price'];　// 柄毎に変わる可能性あり
+		var tax_rate = 0.08;
 		var nbs_code = 'xxxxxxx';
 		var nbs_size_code = 'XX';
 		var nbs_color_code = 'XX';
-		var fabric_width = sizeObj['-width'];
-		var fabric_height = sizeObj['-height'];
-		var option_image = null;
+		var fabric_width = sizeObj['-width'];	// 柄毎に変わる可能性あり
+		var fabric_height = sizeObj['-height'];	// 柄毎に変わる可能性あり
+
+		// avatar_front(back)の取得
+		var dataurl;
+		// avatar_front
+		dataurl = document.getElementById('front').toDataURL(MIMEtype);
+		if (dataurl.indexOf(URIhead) < 0)
+		{
+			alert('このブラウザではjpegデータに変換できません');
+			return;
+		}
+		var avatar_front = dataurl.replace(URIhead + ';base64,', '');
+		// avatar_back
+		dataurl = document.getElementById('back').toDataURL(MIMEtype);
+		var avatar_back = dataurl.replace(URIhead + ';base64,', '');
 
 		// order_no
 		insertTextElement(orderXML, 'order_no', orderNo);
@@ -945,6 +1091,7 @@ Basket.prototype.ItemToXML = function(orderNo)
 		// total_amount
 		insertTextElement(orderXML, 'total_amount', total_amount);
 		// total_tax
+		var total_tax = total_amount * tax_rate;
 		insertTextElement(orderXML, 'total_tax', total_tax);
 		// avatar_front
 		insertTextElement(orderXML, 'avatar_front', avatar_front);
@@ -1006,19 +1153,19 @@ Basket.prototype.ItemToXML = function(orderNo)
 		// <layout_flag>true</layout_flag>
 		insertTextElement(order_option, 'layout_flag', 'true');
 		// <layered_order>0</layered_order>
-		insertTextElement(order_option, 'layout_order', '0');
+		insertTextElement(order_option, 'layered_order', '0');
 		// <design_code></design_code>
 		insertTextElement(order_option, 'design_code', typeObj['-code']);
 		// <design_name></design_name>
 		insertTextElement(order_option, 'design_name', typeObj['-name']);
-		// <option_code></option_name>
-		insertTextElement(order_option, 'option_code', colorObj['-code']);
 		// <option_swatch></option_swatch>
+		insertTextElement(order_option, 'option_swatch', colorObj['-code']);
+		// <option_name></option_name>
 		insertTextElement(order_option, 'option_name', colorObj['-name']);
 		// <order_quantity/> mashnaviでは未設定？
 		insertTextElement(order_option, 'order_quantity', null);
 		// <option_image>
-		insertTextElement(order_option, 'option_image', option_image);
+		insertTextElement(order_option, 'option_image', color_image);
 		// <unit_price></unit_price>
 		insertTextElement(order_option, 'unit_price', total_amount);
 		// <tax></tax>
@@ -1052,6 +1199,84 @@ Basket.prototype.ItemToXML = function(orderNo)
 		return elem;
 	}
 }
+//
+//	XML出力用にbase64データに変換し、完了後に指定関数を起動する
+//
+Basket.prototype.invokeAFunctionAfterGeneratingBase64data = function(mime, afunc)
+{
+	this.base64array = [];
+	// ベースカラー
+	this.base64array.push({file: this.curColor['-url'], done: false, data: null});
+	var i;
+	// パーツオプションを追加
+	var buttonFolder =  this.curType['-buttonFolder']; // 'catalog/PNP00Z/';
+	for (i = 0; i < this.partsarray.length; i++)
+	{
+		if (this.partsarray[i].partsCode != null) {
+			var partsbutton = this.partsarray[i].button;
+			this.base64array.push({file: buttonFolder + partsbutton, done: false, data: null});
+		} else {
+			this.base64array.push({done: true});
+		}
+	}
+	// ベースカラーとオプションパーツイメージをbase64に変換
+	for (i = 0; i < this.base64array.length; i++)
+	{
+		if (!this.base64array[i].done)
+			convertAnImageFileOfArray(this.base64array, i, i > 0, mime, afunc);
+	}
+
+	function convertAnImageFileOfArray(imgarray, index, useAlt, mime, afunc)
+	{
+		var img = new Image();
+		var flname = imgarray[index].file;
+		imgarray[index].img = img;
+		// img.crossOrigin = 'anonymous';
+		img.colfile = flname;
+		img.onload = function() {
+			if (typeof(console) != 'undefined')
+				console.log('button image loaded:' + this.colfile);
+			if (this.wk_canvas == null) {
+				this.wk_canvas = document.createElement('canvas');
+			}
+			this.wk_canvas.width = img.width;
+			this.wk_canvas.height = img.height;
+			// Copy the image contents to the canvas
+			var ctx = this.wk_canvas.getContext('2d');
+			ctx.drawImage(img, 0, 0, img.width, img.height);
+			var dataurl = this.wk_canvas.toDataURL(mime);
+			imgarray[index].data = dataurl.replace('data:' + mime + ';base64,', '');
+			imgarray[index].done = true;
+			imgarray[index].img = null;
+			triggerFunc(imgarray, afunc);
+		}
+		img.onerror = function(evt) {
+			if (useAlt) {
+				var repstr = flname.replace(/\/PNP\d\d/, '/PNP00');
+				if (repstr != flname) {
+					imgarray[index].file = repstr;
+					convertAnImageFileOfArray(imgarray, index, false, mime, afunc);
+					return;
+				}
+			}
+			alert('button image load error:' + this.colfile + errorToString(evt));
+			imgarray[index].done = true;
+			imgarray[index].img = null;
+			// console.log(errorToString(evt.target));
+			triggerFunc(imgarray, afunc);
+		}
+		img.src = flname;
+
+		function triggerFunc(imgarray, afunc) {
+			for (var i = 0; i < imgarray.length; i++) {
+				if (!imgarray[i].done) {
+					return;
+				}
+			}
+			afunc(imgarray);
+		}
+	}
+}
 
 function selectParts(pbasket, opt, code, mode)
 {	
@@ -1078,6 +1303,8 @@ function selectParts(pbasket, opt, code, mode)
 		if (layobj.partsCode != null)
 		{
 			layobj.partsCode = null;
+			layobj.partsObj = null;
+			layobj.button = null;
 			layobj.front = null;
 			layobj.back = null;
 			layobj.fimage = null;
@@ -1112,27 +1339,15 @@ function selectParts(pbasket, opt, code, mode)
 			}
 			layobj.fimage = layobj.bimage = null;
 			layobj.partsCode = code;
+			layobj.partsObj = partsobj;
+			layobj.button = partsobj['-button'];
 			layobj.front = partsobj['-front'];
 			if (layobj.front != null &&
 		    	    layobj.front != '')
 			{
-				nimage = new Image();
-				nimage.crossOrigin = 'anonymous';
 				var partsFile = partsFolder + layobj.front;
-				layobj.fimage = nimage;
-				nimage.partsfile = partsFile;
-				nimage.onload = function() {
-					if (typeof(console) != 'undefined')
-						console.log('parts image loaded:' + this.partsfile);
-					pbasket.redraw(true);
-				}
-				nimage.onerror = function() {
-					layobj.fimage = null;
-					// console.log('parts image load error:' + this.partsfile);
-					if (defaultPartsFileLoad(pbasket, layobj, partsFile, true) == null)
-						pbasket.redraw(true);
-				}
-				nimage.src = partsFile;
+				loadAnImageFile(pbasket, layobj, "fimage", partsFile, true, 'parts image');
+
 				if (Basket.onload_skipable && nimage.width > 0)
 					immediateDraw = true;
 			}
@@ -1141,23 +1356,8 @@ function selectParts(pbasket, opt, code, mode)
 			if (layobj.back != null &&
 		    	    layobj.back != '')
 			{
-				nimage = new Image();
-				nimage.crossOrigin = 'anonymous';
 				var partsFile = partsFolder + layobj.back;
-				layobj.bimage = nimage;
-				nimage.partsfile = partsFile;
-				nimage.onload = function() {
-					if (typeof(console) != 'undefined')
-						console.log('parts image loaded:' + this.partsfile);
-					pbasket.redraw(true);
-				}
-				nimage.onerror = function() {
-					layobj.bimage = null;
-					// console.log('parts image load error:' + this.partsfile);
-					if (defaultPartsFileLoad(pbasket, layobj, partsFile, false) == null)
-						pbasket.redraw(true);
-				}
-				nimage.src = partsFile;
+				loadAnImageFile(pbasket, layobj, "bimage", partsFile, true, 'parts image');
 				if (Basket.onload_skipable && nimage.width > 0)
 					immediateDraw = true;
 			}
@@ -1175,34 +1375,54 @@ function selectParts(pbasket, opt, code, mode)
 	}
 	return -1;
 
-	function defaultPartsFileLoad(pbasket, layobj, partsFile, foreground)
+
+}
+
+function errorToString(err)
+{
+	return ''; // JSON.stringify(err);
+	var str = '';
+	for (var key in err)
 	{
-		var repstr = partsFile.replace(/\/PNP\d\d/, '/PNP00');
-		if (repstr == partsFile)
-			return null;
-		nimage = new Image();
-		nimage.crossOrigin = 'anonymous';
-		if (foreground)
-			layobj.fimage = nimage;
-		else
-			layobj.bimage = nimage;
-		nimage.partsfile = repstr;
-		nimage.onload = function() {
-			if (typeof(console) != 'undefined')
-				console.log('parts image loaded:' + this.partsfile);
-			pbasket.redraw(true);
-		}
-		nimage.onerror = function() {
-			if (foreground)
-				layobj.fimage = null;
-			else
-				layobj.bimage = null;
-			alert('parts image reload error:' + this.partsfile);
-			pbasket.redraw(true);
-		}
-		nimage.src = repstr;
-		return repstr;
+		str += (':' + key /* + '=' + err[key] */);
 	}
+	return str; /* err.code + ':' + err.name + ':' + err.description*/
+}
+
+function alternatingFileLoad(pbasket, layobj, fbimage, partsFile, descr)
+{
+	var repstr = partsFile.replace(/\/PNP\d\d/, '/PNP00');
+	if (repstr == partsFile)
+		return null;
+	loadAnImageFile(pbasket, layobj, fbimage, repstr, false, descr);
+		return repstr;
+}
+
+
+
+function loadAnImageFile(pbasket, obj, imgname, flname, useAlt, descr)
+{
+	var img = obj[imgname] = document.createElement('Img'); // new Image();
+	// img.crossOrigin = 'anonymous';
+	img.colfile = flname;
+	img.onload = function() {
+		if (typeof(console) != 'undefined')
+			console.log(descr + ' loaded:' + this.colfile);
+		pbasket.redraw(true);
+	}
+	img.onerror = function(evt) {
+		obj[imgname] = null;
+		if (useAlt)
+		{
+			if (alternatingFileLoad(pbasket, obj, imgname, flname, descr) == null)
+				pbasket.redraw(true);
+		}
+		else
+			alert(descr + ' load error:' + this.colfile + errorToString(evt));
+		// console.log(errorToString(evt.target));
+		pbasket.redraw(true);
+	}
+	img.src = flname;
 }
 
 function dress(pbasket) {
@@ -1216,37 +1436,11 @@ function dress(pbasket) {
 		var fimg = null, bimg = null;
 		if (color_f != null && color_f != '')
 		{
-			fimg = pbasket.base.fimage = new Image();
-			fimg.crossOrigin = 'anonymous';
-			fimg.colfile = color_f;
-			fimg.onload = function() {
-				if (typeof(console) != 'undefined')
-					console.log('front base image loaded:' + this.colfile);
-				pbasket.redraw(true);
-			}
-			fimg.onerror = function() {
-				pbasket.base.fimage = null;
-				alert('base image load error:' + this.colfile);
-				pbasket.redraw(true);
-			}
-			fimg.src = color_f;
+			loadAnImageFile(pbasket, pbasket.base, "fimage", color_f, false, 'base front image');
 		}
 		if (color_b != null && color_b != '')
 		{
-			bimg = pbasket.base.bimage = new Image();
-			bimg.crossOrigin = 'anonymous';
-			bimg.colfile = color_b;
-			bimg.onload = function() {
-				if (typeof(console) != 'undefined')
-					console.log('back base image loaded:' + this.colfile);
-				pbasket.redraw(true);
-			}
-			bimg.onerror = function() {
-				pbasket.base.bimage = null;
-				alert('base image load error:' + this.colfile);
-				pbasket.redraw(true);
-			}
-			bimg.src = color_b;
+			loadAnImageFile(pbasket, pbasket.base, "bimage", color_b, false, 'base back image');
 		}
 
 		if (Basket.onload_skipable &&

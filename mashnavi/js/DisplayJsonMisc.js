@@ -65,6 +65,7 @@ function displaySpecList(ispeclist, specarray)
 		{
 			var imgelem = document.createElement('img');
 			imgelem.src = specObj.img;
+			imgelem.crossOrigin = 'anonymous';
 			figelem.appendChild(imgelem);
 		}
 		figelem.setAttribute('onClick', 'chSpecImg(this)');
@@ -79,7 +80,7 @@ function displayItemList(iitemlist, itemarray)
 	clearDisplayList(iitemlist);
 	if (itemarray == null)
 		return;	curItemIndex = -1;
-	// alert('length2=' + children.length);
+	// alert('ItemList length=' + itemarray.length);
 	for (var i = 0; i < itemarray.length; i++)
 	{
 		var item = itemarray[i];
