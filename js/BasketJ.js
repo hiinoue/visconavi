@@ -59,7 +59,9 @@ Basket.prototype.clear = function() {
 Basket.prototype.set_canvas_front = function(canvas, context) {
 	this.canvas_front = canvas;
 	this.context_front = context;
-	if (this.spec_front_width < 0)
+	if (this.spec_front_width < 0 && 
+	    canvas.width != null &&
+	    canvas.height != null)
 	{
 		this.spec_front_width = canvas.width;
 		this.spec_front_height = canvas.height;
@@ -77,7 +79,9 @@ Basket.prototype.get_canvas_front = function() {
 Basket.prototype.set_canvas_back = function(canvas, context) {
 	this.canvas_back = canvas;
 	this.context_back = context;
-	if (this.spec_back_width < 0)
+	if (this.spec_back_width < 0 &&
+	    canvas.width != null &&
+	    canvas.height != null)
 	{
 		this.spec_back_width = canvas.width;
 		this.spec_back_height = canvas.height;
@@ -313,19 +317,19 @@ Basket.prototype.redraw = function(ifPending) {
 		switch (forb)
 		{
 			case 'b':
-				spec_width = pbasket.spec_back_width;
-				spec_height = pbasket.spec_back_height;
+				spec_width = Number(pbasket.spec_back_width);
+				spec_height = Number(pbasket.spec_back_height);
 				break;
 			default:
-				spec_width = pbasket.spec_front_width;
-				spec_height = pbasket.spec_front_height;
+				spec_width = Number(pbasket.spec_front_width);
+				spec_height = Number(pbasket.spec_front_height);
 				break;
 		}
 		var baseimg = pbasket.base[imgname];
 		if (baseimg != null)
 		{
-			imgwdt = baseimg.width;
-			imghgt = baseimg.height;
+			imgwdt = Number(baseimg.width);
+			imghgt = Number(baseimg.height);
 		}
 		if (imgwdt <= 0 ||
 		    imghgt <= 0)
@@ -372,7 +376,7 @@ Basket.prototype.redraw = function(ifPending) {
 				if (spec_width * tgt_height < spec_height * tgt_width)
 					adjustWidth = true;
 				else
-					adjustHeigth = true;
+					adjustHeight = true;
 			}
 			else
 				adjustWidth = true;
