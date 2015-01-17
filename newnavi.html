@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html manifest="vasconavi.manifest">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<style type="text/css">
+  h2 {float: left; 
+	  background: linear-gradient(to bottom, #FF9, #9C0);
+	  background: -moz-linear-gradient(top, #FF9, #9C0);
+	  background: -webkit-gradient(linear, left top, left bottom, from(#FF9), to(#9C0));
+	}
+  #action button {margin-left: 10px;
+	  border-radius: 5px; border-style: outset; 
+	  background: linear-gradient(to bottom, #CFF, #6CC);
+	  background: -moz-linear-gradient(top, #CFF, #6CC);
+	  background: -webkit-gradient(linear, left top, left bottom, from(#CFF), to(#6CC));
+	}
+  #spectab figure, #opttab figure, #sizelist figure {
+	  background: linear-gradient(to bottom, rgba(255, 255, 200, 0.5), rgba(192, 192, 150, 0.5));
+	  background: -moz-linear-gradient(top, rgba(255, 255, 200, 0.5), rgba(192, 192, 150, 0.5));
+	  background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 200, 0.5)), to(rgba(192, 192, 150, 0.5)));
+	}
+  #prev {display: none;}
+  #selectMisc {position: relative; z-index: 0; overflow: auto;}
+  #selectSpec {background-color: white; z-index: 1; opacity: 1.0; }
+  #selectDesign {background-color: white; z-index: 2; opacity: 1.0;}
+  #selectSize {float: left; z-index: 0; background-color: white; height: 600px;}
+  #itemtab {float: left; overflow: auto; /* width: 125px; */ height: 600px; background-color: #DDDDDD;}
+  #itemtab table {border-collapse: separate; border-spacing: 10px 10px;}
+  #itemtab tr {background-color: white;}
+  #waydiv {float: left; overflow: auto; width: 480px; height: 600px; background-color: #DDDDDD; margin: 0px 10px;}
+  #waydiv table {border-collapse: separate; border-spacing: 0px 0px;}
+  #colorlist tr {background-color: white;}
+  #colorlist th {padding: 2px;}
+  #opttab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
+  #partstab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
+  td:hover {background-color: lightblue;}
+  td:active {background-color: red;}
+  #colorlist td figcaption {white-space: nowrap; text-overflow: clip; width: 100px;}
+  #offline {background-color: yellow; display: none; border-style: none;}
+  #avatar_area {float: left; background-color: #EFEFEF; z-index: 2; opacity: 1.0; padding: 0px; height: 600px;}
+  #front_back {background-color: white; opacity: 1.0; height: 600px; padding: 0px; margin: 0px 10px 0px 10px; }
+  #front {background-color: yellow; height: 600px; margin: 0px 0px 0px 0px; padding: 0px;}
+  #back {background-color: white; height: 600px; margin: 0px 0px 0px 0px; padding: 0px;}
+  #spectab figure, #optlist figure, #sizelist figure {border-radius: 5px; border-style: outset;} 
+  #SizeData {display: none;}
+  #matashita {width: 120px; height: 20px; margin: 5px 0px 3px 8px;}
+  #matashita_min {width: 50px; height: 20px; border: 0;}
+  #matashita_max {width: 50px; height: 20px; border: 0;}
+
+  .c-both {clear: both;}
+
+   /* tootip用 css */
+    .tooltip {  
+      position: relative;  
+    }  
+    .tooltip .tooltipBody {  
+      border: solid 2px #f98325;  
+      -moz-border-radius: 4px;  
+      -webkit-border-radius: 4px;  
+      border-radius: 4px;  
+      position: absolute;  
+      left: 1em;  
+      top: 0.0em;  /* -2.7e を修正 */
+      text-decoration: none;  
+      visibility: hidden;  
+      padding: 3px 5px;  
+      width: 120px; /* 200px を修正 */
+      zoom: 1;  
+    }  
+    .tooltip:hover ,  
+    .tooltip:hover .tooltipBody {  
+      background-color: white;  
+      visibility: visible;  
+      z-index: 10;  
+    }  
+    .tooltip .tooltipBody .tooltipAngle {  
+      border-right: solid 10px transparent;  
+      border-left-width: 0;  
+      border-top: solid 10px #f98325;  
+      line-height: 0;  
+      position: absolute;  
+      left: 1em;  
+      bottom: -10px;  
+    }  
+    .tooltip .tooltipBody .tooltipAngle .tooltipAngleInner {  
+      border-right: solid 5px transparent;  
+      border-left-width: 0;  
+      border-top: solid 5px white;  
+      line-height: 0;  
+      position: absolute;  
+      left: 2px;  
+      bottom: 5px;  
+    }  
+      
+    /*  not supported tanseparent for border by IE6. */  
+    * html .tooltip .tooltipBody .tooltipAngle {  
+      border-right-color: white;  
+      bottom: -11px;  
+    }  
+    * html .tooltip .tooltipBody .tooltipAngle .tooltipAngleInner {  
+      border-right-color: #f98325;  
+    }  
+</style>
+<title>canvasでImageを描く</title>
+<script src="js/BasketJ.js" language="javascript"></script>
+<script src="js/DisplayJsonMisc.js" language="javascript"></script>
+<script src="js/makeJsonArray.js" language="javascript"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
+<script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+<script type="text/javascript" src="js/olddenim_jsonp001.js" language="javascript"></script>
+
+</head>
+<body onLoad="select_spec()" ongesturestart="bodyGesture(event)" ongesturechange="bodyGesture(event)" onTouchStart="bodyTouch(event)" onTouchMove="bodyTouch(event)">
+   <h2>HTML5 新ナビ 2014-12-18 15:05</h2>
+   <div id="action">
+    <br>
+    <button type="button" id="prev" onClick="prevPage()">前頁</button>
+    <button type="button" id="next" onClick="nextPage()">次頁</button>
+   </div>
+   <div class="c-both"></div>
+   <div id="selectMisc">
+    <table>
+     <tbody>
+      <tr>
+      <td id="Entrance">
+	    <div id="selectSpec">
+	     <div id="spectab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
+	      <table>
+	       <tbody id="speclist">
+	       </tbody>
+	      </table>
+	     </div>
+	    </div>
+      </td>
+      <td id="simulation">
+	    <div id="selectDesign">
+	     <div id="itemtab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	      <table>
+	       <tbody id="itemlist">
+	       </tbody>
+	      </table>
+	     </div>
+	     <div id="avatar_area">
+	      <div id="front_back" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	       <!-- canvas width="300" height="850" id="offline">
+	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
+	       </canvas -->
+	       <canvas width="300" height="900" id="front" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
+	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
+	       </canvas>
+	       <canvas width="300" height="900" id="back" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
+	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
+	       </canvas>
+	      </div>
+	     </div>
+	     <div id="waydiv" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	      <table>
+	       <tbody id="colorlist">
+	       </tbody>
+	      </table>
+	     </div>
+	     <div id="opttab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
+	      <table>
+	       <tbody id="optlist">
+	       </tbody>
+	      </table>
+	     </div>
+	     <div id="partstab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
+	      <table>
+	       <tbody id="partslist">
+	       </tbody>
+	      </table>
+	     </div>
+	    </div>
+      </td>
+      <td id="SizeData">
+	    <div id="selectSize">
+	   	<label>サイズ指定</label>
+		<table>
+		  <tbody id="sizelist">
+		  <tbody>
+		</table>
+	   	<label>股下指定</label>
+		<table>
+		  <tbody>
+		    <tr>
+		      <td>
+	   		<textarea id="matashita_min" readonly>最短値</textarea>
+		      </td>
+		      <td>
+			<!-- select name="股下" id="matashita"></select -->
+			<div id="matashita"></div>
+		      </td>
+		      <td>
+	   		<textarea id="matashita_max" readonly>最長値</textarea>
+		      </td>
+		    </tr>
+		  </tbody>
+		</table>
+	        <div id="slidervalue"></div>
+		<!-- section>
+		<p>キャッシュ状況を表示します。</p>
+		<button onclick="applicationCache.update()">キャッシュを更新する</button>
+		<div id="output"></div>
+		</section -->
+	    </div>
+	    <!-- div>
+		<form id="upload-form" method="post" enctype="multipart/form-data">
+			<!-- textarea id="upload-filename" name="FileName" size="27">PN000011.xml</textarea -->
+			<!-- textarea id="upload-content" name="orderSend" size="27">del="yes"</textarea -->
+		</form>
+	    </div -->
+      </td>
+      </tr>
+     </tbody>
+    </table>
+   </div>
+
+</body>
+</html>
