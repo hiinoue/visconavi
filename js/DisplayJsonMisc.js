@@ -92,6 +92,7 @@ function displaySpecList(specbox, specarray)
 
 function displayItemList(itembox, itemarray)
 {
+	var dispItemName = true;
 	if (itembox == null)
 		return;
 	itembox.clear();
@@ -110,9 +111,13 @@ function displayItemList(itembox, itemarray)
 		imgelem.src = item['-url'];
 		imgelem.alt = i;
 		imgelem.setAttribute('onClick', 'chItemImg(this)');
-		imgelem.style.width = '100px';
-		// imgelem.style.height = '100px';
 		tdelem.appendChild(imgelem);
+		if (dispItemName) {
+			textelem = document.createElement('span');
+			textelem.setAttribute('class', 'itemlabel');
+			tdelem.appendChild(textelem);
+			textelem.appendChild(document.createTextNode(item['-name']));
+		}
 	}
 }
 
