@@ -343,6 +343,32 @@ function displayMatashitaList(matashitabox)
 		matashitabox.setSelected(selindex);
 	}
 }
+function displayMatashitaScale(imatashitaScale)
+{
+	while (imatashitaScale.firstChild) {
+		imatashitaScale.removeChild(imatashitaScale.firstChild);
+	}
+	
+	var jscache = basket.jscache;
+
+	if (jscache.matashitaArray == null)
+	{
+		imatashitaScale.style.visibility = 'hidden';
+		return;
+	}
+	imatashitaScale.style.visibility = 'visible';
+
+	var cacheArray = jscache.matashitaArray;
+	var min_matashita = cacheArray[0];
+	var max_matashita = cacheArray[cacheArray.length - 1];
+	var step = 2;
+	for (i = min_matashita; i <= max_matashita; i += step)
+	{
+		var tdelem = document.createElement('td');
+		imatashitaScale.appendChild(tdelem);
+		tdelem.appendChild(document.createTextNode(i));
+	}
+}
 
 function displayMatashitaSlider(matashitabox)
 {

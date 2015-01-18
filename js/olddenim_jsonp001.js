@@ -257,6 +257,7 @@ function setItemNo(itemno)
 	displaySizeList(size_box, basket.getSizeCache());
 	// displayMatashitaList(hlist_matashita);
 	displayMatashitaSlider(matashita_box);
+	displayMatashitaScale(document.getElementById('matashitaScale'));
 }
 
 function displayOptParts(newOptIndex)
