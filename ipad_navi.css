@@ -9,42 +9,50 @@
 	  background: -moz-linear-gradient(top, #CFF, #6CC);
 	  background: -webkit-gradient(linear, left top, left bottom, from(#CFF), to(#6CC));
 	}
+  td:hover {background-color: lightblue;}
+  td:active {background-color: red;}
+
+  #prev {display: none;}
+
+  #selectSpec {background-color: white; opacity: 1.0; }
+  #spectab figure, #optlist figure, #sizelist figure {border-radius: 5px; border-style: outset;}
   #spectab figure, #opttab figure, #sizelist figure {
 	  background: linear-gradient(to bottom, rgba(255, 255, 200, 0.5), rgba(192, 192, 150, 0.5));
 	  background: -moz-linear-gradient(top, rgba(255, 255, 200, 0.5), rgba(192, 192, 150, 0.5));
 	  background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 200, 0.5)), to(rgba(192, 192, 150, 0.5)));
 	}
-  #prev {display: none;}
+
   #selectMisc {position: relative; overflow: auto;}
-  #selectSpec {background-color: white; opacity: 1.0; }
   #selectDesign {background-color: white; opacity: 1.0;}
-  #selectSize {float: left; background-color: white; height: 600px;}
-  #itemtab {float: left; overflow: auto; /* width: 125px; */ height: 600px; background-color: #DDDDDD;}
+  #itemdiv {float: left; overflow: auto; /* width: 125px; */ height: 650px; background-color: #DDDDDD;}
+  #itemtab {height: 600px; overflow: auto;}
   #itemtab table {border-collapse: separate; border-spacing: 10px 10px;}
   #itemtab tr {background-color: white;}
   #itemtab td {position: relative;}
   #itemtab img {width: 100px;}
   .itemlabel {position: absolute; top: 100px; left: 10px; width: 90px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
-  
-  #waydiv {float: left; overflow: auto; width: 480px; height: 600px; background-color: #DDDDDD; margin: 0px 10px;}
-  #waydiv table {border-collapse: separate; border-spacing: 0px 0px;}
-  #colorlist tr {background-color: white;}
-  #colorlist th {padding: 2px;}
-  #colorlist td {padding: 0px;}
-  #opttab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
-  #partstab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
-  td:hover {background-color: lightblue;}
-  td:active {background-color: red;}
-  #colorlist td figcaption {width: 90px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
+  #price {height: 50px; margin: 0px;}
   #offline {background-color: yellow; display: none; border-style: none;}
  
  /* canvas area */
-  #avatar_area {float: left; background-color: #EFEFEF; opacity: 1.0; padding: 0px; height: 600px;}
-  #front_back {background-color: white; opacity: 1.0; height: 600px; padding: 0px; margin: 0px 10px 0px 10px; }
-  #front {background-color: yellow; width: 200px; height: 600px; margin: 0px 0px 0px 0px; padding: 0px;}
-  #back {background-color: white; width: 200px; height: 600px; margin: 0px 0px 0px 0px; padding: 0px;}
+  #avatar_area {float: left; width: 420px; height: 650px; padding: 0px; background-color: #EFEFEF; opacity: 1.0;}
+   #front_back {position: relative;  width: 400px; height: 600px; padding: 0px; margin: 0px 10px 0px 10px; background-color: white; opacity: 1.0;}
+    #front {position: absolute; top: 0px; left: 0px; height: 600px; margin: 0px 0px 0px 0px; padding: 0px; background-color: yellow;}
+    #back {position: absolute; top: 450px; left: 300px; height: 150px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
 
-  #spectab figure, #optlist figure, #sizelist figure {border-radius: 5px; border-style: outset;} 
+  #waydiv {float: left; overflow: auto; width: 480px; height: 650px; margin: 0px 10px; background-color: #DDDDDD;}
+   #colortab {width: 480px; height: 600px; overflow-x: hidden; overflow-y: auto;  margin: 0px;}
+   #colortab table {border-collapse: separate; border-spacing: 0px 0px; width: 480px;}
+   #colorlist tr {background-color: white; width: 465px;}
+   #colorlist th {padding: 2px;}
+   #colorlist td {padding: 0px;}
+   #colorlist td figcaption {width: 90px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
+  #priceless {height: 50px; margin: 0px;}
+
+  #opttab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
+  #partstab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
+
+  #selectSize {float: left; height: 600px; background-color: white;}
   #SizeData {display: none;}
   #matashita {width: 120px; height: 20px; margin: 5px 0px 3px 8px;}
   #matashita_min {width: 50px; height: 20px; border: 0;}

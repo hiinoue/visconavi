@@ -39,30 +39,40 @@
       </td>
       <td id="simulation">
 	    <div id="selectDesign">
-	     <div id="itemtab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
-	      <table>
-	       <tbody id="itemlist">
-	       </tbody>
-	      </table>
+	     <div id="itemdiv" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	      <div id="itemtab">
+	       <table>
+	        <tbody id="itemlist">
+	        </tbody>
+	       </table>
+	      </div>
+	      <span id="price">
+    		<button type="button" id="nextview" onClick="nextPage()">次頁</button>
+	      </span>
 	     </div>
 	     <div id="avatar_area">
-	      <div id="front_back" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	      <span id="front_back" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
 	       <!-- canvas width="300" height="850" id="offline">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
 	       </canvas -->
-	       <canvas id="front" width="300" height="900" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
+	       <canvas id="front" width="600" height="900" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
 	       </canvas>
-	       <canvas id="back" width="300" height="900" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
+	       <canvas id="back" width="600" height="900" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
 	       </canvas>
-	      </div>
+	      </span>
 	     </div>
 	     <div id="waydiv" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
-	      <table>
-	       <tbody id="colorlist">
-	       </tbody>
-	      </table>
+	      <div id="colortab">
+	       <table>
+	        <tbody id="colorlist">
+	        </tbody>
+	       </table>
+	      </div>
+	      <span id="priceless">
+    		<button type="button" id="prevview" onClick="prevPage()">前頁</button>
+	      </span>
 	     </div>
 	     <div id="opttab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
 	      <table>
@@ -86,28 +96,25 @@
 		  <tbody>
 		</table>
 	   	<label>股下指定</label>
+		<span>
+		</span>
 		<table>
 		  <tbody>
 		    <tr>
 		      <td>
-	   		<textarea id="matashita_min" readonly>最短値</textarea>
+	   		<textfield id="matashita_min" readonly>最短値</textarea>
 		      </td>
 		      <td>
 			<!-- select name="股下" id="matashita"></select -->
 			<div id="matashita"></div>
 		      </td>
 		      <td>
-	   		<textarea id="matashita_max" readonly>最長値</textarea>
+	   		<textfield id="matashita_max" readonly>最長値</textarea>
 		      </td>
 		    </tr>
 		  </tbody>
 		</table>
 	        <div id="slidervalue"></div>
-		<!-- section>
-		<p>キャッシュ状況を表示します。</p>
-		<button onclick="applicationCache.update()">キャッシュを更新する</button>
-		<div id="output"></div>
-		</section -->
 	    </div>
 	    <!-- div>
 		<form id="upload-form" method="post" enctype="multipart/form-data">
