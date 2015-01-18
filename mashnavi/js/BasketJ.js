@@ -64,6 +64,10 @@ Basket.prototype.set_canvas_front = function(canvas, context) {
 		this.spec_front_width = canvas.width;
 		this.spec_front_height = canvas.height;
 	}
+	if (this.offimg == null) {
+		this.offimage = document.createElement('canvas');
+		this.offctx = this.offimage.getContext('2d');
+	}
 }
 
 Basket.prototype.get_canvas_front = function() {
@@ -473,8 +477,11 @@ Basket.prototype.redraw = function(ifPending) {
 					}
 					for (var j = 0; j < 4 * pic; j++)
 					{
-	    					rgbv = basedt.data[j] * imgdt.data[j] / 255;
-	    					basedt.data[j] = (rgbv > 255 ? 255 : rgbv);
+						if (j % 4 != 3)
+						{
+	    						rgbv = basedt.data[j] * imgdt.data[j] / 255;
+	    						basedt.data[j] = (rgbv > 255 ? 255 : rgbv);
+						}
 					}
 					break;
 				case 'add':
@@ -486,8 +493,11 @@ Basket.prototype.redraw = function(ifPending) {
 					}
 					for (var j = 0; j < 4 * pic; j++)
 					{
-						rgbv = basedt.data[j] + imgdt.data[j];
-						basedt.data[j] = (rgbv > 255 ? 255 : rgbv);
+						if (j % 4 != 3)
+						{
+							rgbv = basedt.data[j] + imgdt.data[j];
+							basedt.data[j] = (rgbv > 255 ? 255 : rgbv);
+						}
 					}
 					break;
 				case '%mask':

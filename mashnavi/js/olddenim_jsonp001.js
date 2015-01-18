@@ -10,6 +10,15 @@ const page_selway = 1;
 const page_selsize = 2;
 const max_page = 3;
 
+const display_default = 'inline-block';
+
+var item_box;
+var color_box;
+var size_box;
+var opt_box;
+var parts_box;
+var matashita_box;
+
 
 var specarray = [{description: ['ゴルフパンツ', 'メンズ'], config: 'catalog/MashNaviItem_golf.js', img: 'catalog/Thumbnail/golf.png'}, 
 		 {description: ['デニムナビ', 'レディースフラット'], config: 'js/MashNaviItem_mobile.js'}
@@ -26,8 +35,8 @@ function select_spec()
 	fileSystemApiTest();
 	alert('canvas.toDataURL=' + document.createElement('canvas').toDataURL('image/jpeg').indexOf('data:image/jpeg'));
 
-	var hlist_spec = document.getElementById('speclist');
-	displaySpecList(hlist_spec, specarray);
+	var spec_box = new DisplayBox(document.getElementById('speclist'));
+	displaySpecList(spec_box, specarray);
 
 	var today = new Date();
 	var orderdate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
@@ -99,25 +108,25 @@ function handle_json(jsondata)
 	basket.set_canvas_back(canvas, context);
 	//alert('canvas_back=' + basket.get_canvas_back());
 	//オフライン描画コンテキストの取得
-	canvas = document.getElementById('offline');
+	/* canvas = document.getElementById('offline');
 	context = canvas.getContext('2d');
-	basket.set_offimage(canvas, context);
+	basket.set_offimage(canvas, context);*/
 						
-	hlist_item = document.getElementById('itemlist');
-	hlist_color = document.getElementById('colorlist');
-	hlist_size = document.getElementById('sizelist');
-	hlist_matashita = document.getElementById('matashita');
-	hlist_opt = document.getElementById('optlist');
-	hlist_parts = document.getElementById('partslist');
-	// クリア
-	clearDisplayList(hlist_item);
-	clearDisplayList(hlist_color);
-	clearDisplayList(hlist_size);
-	// clearDisplayList(hlist_matashita);
-	clearDisplayList(hlist_opt);
-	clearDisplayList(hlist_parts);
+	var dlist_item = document.getElementById('itemlist');
+	var dlist_color = document.getElementById('colorlist');
+	var dlist_size = document.getElementById('sizelist');
+	var dlist_matashita = document.getElementById('matashita');
+	var dlist_opt = document.getElementById('optlist');
+	var dlist_parts = document.getElementById('partslist');
 
-	displayItemList(hlist_item, basket.getItemCache());
+	item_box = new DisplayBox(dlist_item, 1);
+	color_box = new DisplayBox(dlist_color, 4);
+	size_box = new DisplayBox(dlist_size, 5);
+	opt_box = new DisplayBox(dlist_opt, 1);
+	parts_box = new DisplayBox(dlist_parts, 1);
+	matashita_box = new DisplayBox(dlist_matashita);
+
+	displayItemList(item_box, basket.getItemCache());
 }
 
 //
@@ -229,32 +238,32 @@ function setItemNo(itemno)
 {
 	var makeArray = basket.setItemNo(itemno);
 
-	itemIndexSelected = setSelected(hlist_item, itemIndexSelected, itemno);
+	item_box.setSelected(itemno);
 	if (makeArray != null)
 	{
 		if (makeArray[0])
 		{ 
-			displayColorList(hlist_color, basket.getColorCache());
-			colorIndexSelected = setSelected(hlist_color, colorIndexSelected, 0);
+			displayColorList(color_box, basket.getColorCache());
+			color_box.setSelected(0);
 		}
 		if (makeArray[1])
 		{ 
 			var optCache = basket.getOptCache();
-			displayOptList(hlist_opt, optCache);
+			displayOptList(opt_box, optCache);
 			var newOptIndex = (optCache == null || optCache.length == 0 ? -1 : 0);
 			displayOptParts(newOptIndex);
 		}
 	}
-	displaySizeList(hlist_size, basket.getSizeCache());
+	displaySizeList(size_box, basket.getSizeCache());
 	// displayMatashitaList(hlist_matashita);
-	displayMatashitaSlider(hlist_matashita);
+	displayMatashitaSlider(matashita_box);
 }
 
 function displayOptParts(newOptIndex)
 {
 	var jscache = basket.jscache;
-	displayPartsList(hlist_parts, jscache.makePartsArray(newOptIndex));
-	optIndexSelected = setSelected(hlist_opt, optIndexSelected, newOptIndex);
+	displayPartsList(parts_box, jscache.makePartsArray(newOptIndex));
+	opt_box.setSelected(opt_box, newOptIndex);
 }
 
 function chItemImg(opt)
@@ -266,7 +275,7 @@ function chItemImg(opt)
 function selectColorImage(colorIndex)
 {
 	basket.setColor(colorIndex >= 0 ? basket.getColorCache()[colorIndex][0] : null);
-	colorIndexSelected = setSelected(hlist_color, colorIndexSelected, colorIndex);
+	color_box.setSelected(colorIndex);
 }
 function chColImg(opt)
 {
@@ -280,7 +289,7 @@ function handleOpts(event)
 		return;
  	document.getElementById('opttab').style.visibility = 'visible';
 	document.getElementById('partstab').style.visibility = 'visible';
-	displayOptList(hlist_opt, optCache);
+	displayOptList(opt_box, optCache);
 	newIndex = 0;
 	displayOptParts(newIndex);
 }
@@ -302,40 +311,40 @@ function setPage(page)
 		case 0:
 			prev.style.display = 'none';
 			next.style.display = 'none';
-			selSpec.style.display = 'inline';
+			selSpec.style.display = display_default;
 			simu.style.display = 'none';
  			// selSize.style.zIndex = '-1';
 			szdata.style.display = 'none';
 			break;
 		case 1:
-			prev.style.display = 'inline';
-			next.style.display = 'inline';
+			prev.style.display = display_default;
+			next.style.display = display_default;
 			selSpec.style.display = 'none';
-			simu.style.display = 'inline';
+			simu.style.display = display_default;
 			waydiv.style.display = 
 			opttab.style.display = 
-			partstab.style.display = 'inline';
+			partstab.style.display = display_default;
  			// selSize.style.zIndex = '-1';
 			szdata.style.display = 'none';
 			break;
 		case 2:
-			prev.style.display = 'inline';
-			next.style.display = 'inline';
+			prev.style.display = display_default;
+			next.style.display = display_default;
 			selSpec.style.display = 'none';
-			simu.style.display = 'inline';
+			simu.style.display = display_default;
 			waydiv.style.display = 
 			opttab.style.display = 
 			partstab.style.display = 'none';
  			selSize.style.zIndex = '3';
-			szdata.style.display = 'inline';
+			szdata.style.display = display_default;
 			break;
 		case 3:
-			prev.style.display = 'inline';
+			prev.style.display = display_default;
 			next.style.display = 'none';
 			selSpec.style.display = 'none';
 			simu.style.display = 'none';
  			selSize.style.zIndex = '3';
-			szdata.style.display = 'inline';
+			szdata.style.display = display_default;
 			break;
 	}
 }
@@ -483,7 +492,7 @@ function selectSize(sizeIndex)
 {
 	// alert('size ' + sizeIndexSelected + ' -> ' + sizeIndex);
 	basket.setSizeIndex(sizeIndex);
-	sizeIndexSelected = setSelected(hlist_size, sizeIndexSelected, sizeIndex);
+	size_box.setSelected(sizeIndex);
 	// alert('sizeInexSelected=' + sizeIndexSelected);
 }
 
@@ -495,7 +504,7 @@ function chSize(node)
 function chMatashita(node)
 {
 	//var selidx = hlist_matashita.selectedIndex;
-	basket.setMatashita(hlist_matashita.value);
+	basket.setMatashita(matashita_box.domobj.value);
 }
 
 function chOptImg(node)
@@ -508,7 +517,7 @@ function chOptImg(node)
 
 function SelectPartsImage(opt, code)
 {
-	partsIndexSelected = setSelected(hlist_parts, partsIndexSelected, basket.SelectParts(opt, code));
+	parts_box.setSelected(basket.SelectParts(opt, code));
 }
 function chPartsImg(opt)
 {
@@ -520,9 +529,20 @@ function chPartsImg(opt)
 }
 
 
+function tableTouch(event)
+{
+	console.log('tableTouch type=' + event.type + ' tag=' + event.currentTarget.tagName + ' name=' + event.target.localName);
+	event.stopPropagation();
+}
+
+function bodyTouch(event)
+{
+	console.log('bodyTouch type=' + event.type + ' tag=' + event.currentTarget.tagName + ' name=' + event.target.localName);
+}
 
 function bodyGesture(event)
 {
+	console.log('bodyGesture');
 	event.preventDefault();
 }
 

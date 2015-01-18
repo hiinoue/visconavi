@@ -1,31 +1,47 @@
 <!--
 
+var DisplayBox = function(domobj, maxcolumn) {
 // グローバル
 
-var hlist_item;
-var itemIndexSelected = -1;
-var hlist_color;
-var colorIndexSelected = -1;
-var hlist_size;
-var hlist_matashita;
-var sizeIndexSelected = -1;
-var hlist_opt = null;
-var optIndexSelected = -1;
-var hlist_parts = null;
-var partsIndexSelected = -1;
-
-function clearDisplayList(ilist)
-{
-	while (ilist.firstChild) {
-		ilist.removeChild(ilist.firstChild);
-	}
+	this.domobj = domobj;
+	this.maxcolumn = maxcolumn;
+	this.clear();
 }
 
-function displaySpecList(ispeclist, specarray)
+DisplayBox.prototype.clear = function() {
+	while (this.domobj.firstChild) {
+		this.domobj.removeChild(this.domobj.firstChild);
+	}
+	this.elemarray = [];
+	this.selectedIndex = -1;
+}
+
+DisplayBox.prototype.setSelected = function(newIndex) {
+	if (this.domobj == null)
+		return -1;
+	var arraylen = this.elemarray.length;
+	var curSel = this.selectedIndex;
+	if (curSel >= arraylen)
+		curSel = -1;
+	if (newIndex >= arraylen)
+		return curSel;
+	if (newIndex != curSel)
+	{
+		if (curSel >= 0)
+			this.elemarray[curSel].style.backgroundColor = 'transparent';
+		if (newIndex >= 0)
+			this.elemarray[newIndex].style.backgroundColor = '#99FF00';
+	}
+	this.selectedIndex = newIndex;
+	return newIndex;
+}
+
+
+function displaySpecList(specbox, specarray)
 {
-	if (ispeclist == null)
+	if (specbox == null)
 		return;
-	clearDisplayList(ispeclist);
+	specbox.clear();
 	if (specarray == null)
 		return;
 	var specObj;
@@ -34,9 +50,10 @@ function displaySpecList(ispeclist, specarray)
 	{
 		var specObj = specarray[i];
 		var trelem = document.createElement('tr');
-		ispeclist.appendChild(trelem);
+		specbox.domobj.appendChild(trelem);
 		var tdelem = document.createElement('td');
 		trelem.appendChild(tdelem);
+		specbox.elemarray.push(tdelem);
 		var figelem = document.createElement('figure');
 		figelem.name = i;
 		figelem.style.margin = '0';
@@ -65,7 +82,7 @@ function displaySpecList(ispeclist, specarray)
 		{
 			var imgelem = document.createElement('img');
 			imgelem.src = specObj.img;
-			imgelem.crossOrigin = 'anonymous';
+			// imgelem.crossOrigin = 'anonymous';
 			figelem.appendChild(imgelem);
 		}
 		figelem.setAttribute('onClick', 'chSpecImg(this)');
@@ -73,21 +90,22 @@ function displaySpecList(ispeclist, specarray)
 	}
 }
 
-function displayItemList(iitemlist, itemarray)
+function displayItemList(itembox, itemarray)
 {
-	if (iitemlist == null)
+	if (itembox == null)
 		return;
-	clearDisplayList(iitemlist);
+	itembox.clear();
 	if (itemarray == null)
-		return;	curItemIndex = -1;
+		return;
 	// alert('ItemList length=' + itemarray.length);
 	for (var i = 0; i < itemarray.length; i++)
 	{
 		var item = itemarray[i];
 		var trelem = document.createElement('tr');
-		iitemlist.appendChild(trelem);
+		itembox.domobj.appendChild(trelem);
 		var tdelem = document.createElement('td');
 		trelem.appendChild(tdelem);
+		itembox.elemarray.push(tdelem);
 		var imgelem = document.createElement('img');
 		imgelem.src = item['-url'];
 		imgelem.alt = i;
@@ -98,56 +116,86 @@ function displayItemList(iitemlist, itemarray)
 	}
 }
 
-function displayColorList(icolorlist, colorarray)
+function displayColorList(colorbox, colorarray)
 {
 	var rowPerType = true;
+	var useTooltip = true;
 	var tType = null, type;
+	var collimit = colorbox.maxcolumn;
+	var waycount = 0;
 	var trelem;
-	clearDisplayList(icolorlist);
-	colorIndexSelected = -1;
+	colorbox.clear();
 	for (i = 0; i < colorarray.length; i++)
 	{
 		var color =  colorarray[i][0];
 		if (rowPerType)
 		{
 			type = colorarray[i][1];
-			if (type != tType)
-			{
+			if (type != tType) {
 				trelem = document.createElement('tr');
-				icolorlist.appendChild(trelem);
+				colorbox.domobj.appendChild(trelem);
 				tType = type;
 				var thelem = document.createElement('th');
 				thelem.appendChild(document.createTextNode(type['-name']));
 				trelem.appendChild(thelem);
+				waycount = 0;
+			} else if (waycount >= collimit) {
+				trelem = document.createElement('tr');
+				colorbox.domobj.appendChild(trelem);
+				var thelem = document.createElement('th');
+				thelem.appendChild(document.createTextNode(''));
+				trelem.appendChild(thelem);
+				waycount = 0;
 			}
 		}
 		else
 		{
 			trelem = document.createElement('tr');
-			icolorlist.appendChild(trelem);
+			colorbox.domobj.appendChild(trelem);
 		}
 		var tdelem = document.createElement('td');
 		trelem.appendChild(tdelem);
-		var figelem = document.createElement('figure');
-		figelem.style.margin = '0';
-		tdelem.appendChild(figelem);
-		var imgelem = document.createElement('img');
-		imgelem.src = color['-url'];
-		imgelem.alt = i;
-		imgelem.setAttribute('onClick', 'chColImg(this)');
-		figelem.appendChild(imgelem);
-		var capelem = document.createElement('figcaption');
-		capelem.appendChild(document.createTextNode(color['-name']));
-		figelem.appendChild(capelem);
+		waycount++;
+		colorbox.elemarray.push(tdelem);
+		if (useTooltip) {
+			tdelem.setAttribute('class', 'tooltip');
+			var imgelem = document.createElement('img');
+			imgelem.src = color['-url'];
+			imgelem.alt = i;
+			imgelem.setAttribute('onClick', 'chColImg(this)');
+			tdelem.appendChild(imgelem);
+			var spanelem = document.createElement('span');
+			spanelem.setAttribute('class', 'tooltipBody');
+			tdelem.appendChild(spanelem);
+			spanelem.style.margin = '0px';
+			spanelem.appendChild(document.createTextNode(color['-name']));
+			var spanelem2 = document.createElement('span');
+			spanelem2.setAttribute('class', 'tooltipAngle');
+			spanelem.appendChild(spanelem2);
+			var spanelem3 = document.createElement('span');
+			spanelem3.setAttribute('class', 'tooltipAngleInner');
+			spanelem2.appendChild(spanelem3);
+		} else {
+			var figelem = document.createElement('figure');
+			figelem.style.margin = '0';
+			tdelem.appendChild(figelem);
+			var imgelem = document.createElement('img');
+			imgelem.src = color['-url'];
+			imgelem.alt = i;
+			imgelem.setAttribute('onClick', 'chColImg(this)');
+			figelem.appendChild(imgelem);
+			var capelem = document.createElement('figcaption');
+			capelem.appendChild(document.createTextNode(color['-name']));
+			figelem.appendChild(capelem);
+		}
 	}
 }
 
-function displayOptList(ioptlist, optarray)
+function displayOptList(optbox, optarray)
 {
-	if (ioptlist == null)
+	if (optbox == null)
 		return;
-	clearDisplayList(ioptlist);
-	optIndexSelected = -1;
+	optbox.clear();
 	if (optarray == null)
 		return;
 	var optObj;
@@ -156,9 +204,10 @@ function displayOptList(ioptlist, optarray)
 	{
 		var optObj = optarray[i];
 		var trelem = document.createElement('tr');
-		ioptlist.appendChild(trelem);
+		optbox.domobj.appendChild(trelem);
 		var tdelem = document.createElement('td');
 		trelem.appendChild(tdelem);
+		optbox.elemarray.push(tdelem);
 		var figelem = document.createElement('figure');
 		figelem.name = i;
 		figelem.style.margin = '0';
@@ -176,53 +225,11 @@ function displayOptList(ioptlist, optarray)
 	}
 }
 
-function setSelected(tlist, curIndex, newIndex)
+function displayPartsList(partsbox, partsarray)
 {
-	if (tlist == null)
-		return -1;
-	if (newIndex != curIndex)
-	{
-		var trdelem, tdlist;
-		for (i = 0, j = 0; i < tlist.children.length; i++)
-		{
-			trdelem = tlist.children[i];
-			if (trdelem.tagName.toLowerCase() == 'td')
-			{
-				if (j == curIndex)
-					trdelem.style.backgroundColor = 'transparent';
-				else if (j == newIndex)
-					trdelem.style.backgroundColor = '#99FF00';
-				j++;
-			}
-			else
-			{
-				tdlist = trdelem.getElementsByTagName('td');
-				for (k = 0; k < tdlist.length; k++, j++)
-				{
-					trdelem = tdlist[k];
-					if (j == curIndex)
-						trdelem.style.backgroundColor = 'transparent';
-					else if (j == newIndex)
-						trdelem.style.backgroundColor = '#99FF00';
-				}
-			}
-		/**
-		if (curIndex >= 0)
-			tlist.children[curIndex].style.backgroundColor = 'transparent';
-		if (newIndex >= 0)
-			tlist.children[newIndex].style.backgroundColor = '#99FF00';
-		**/
-		}
-	}
-	return newIndex;
-}
-
-function displayPartsList(ipartslist, partsarray)
-{
-	if (ipartslist == null)
+	if (partsbox == null)
 		return;
-	clearDisplayList(ipartslist);
-	partsIndexSelected = -1;
+	partsbox.clear();
 	if (partsarray == null)
 		return;
 	var optObj = basket.jscache.getOptObject(-1);
@@ -234,9 +241,10 @@ function displayPartsList(ipartslist, partsarray)
 	{
 		var partsObj = partsarray[i];
 		var trelem = document.createElement('tr');
-		ipartslist.appendChild(trelem);
+		partsbox.domobj.appendChild(trelem);
 		var tdelem = document.createElement('td');
 		trelem.appendChild(tdelem);
+		partsbox.elemarray.push(tdelem);
 		var figelem = document.createElement('figure');
 		figelem.style.margin = '0';
 		tdelem.appendChild(figelem);
@@ -251,31 +259,35 @@ function displayPartsList(ipartslist, partsarray)
 		if (partsObj['-code'] == selparts)
 			selindex = i;
 	}
-	partsIndexSelected = setSelected(ipartslist, partsIndexSelected, selindex);
+	partsbox.setSelected(selindex);
 }
 
-function displaySizeList(isizelist, sizearray)
+function displaySizeList(sizebox, sizearray)
 {
-	if (isizelist == null)
+	if (sizebox == null)
 		return;
-	clearDisplayList(isizelist);
-	sizeIndexSelected = -1;
+	sizebox.clear();
 	if (sizearray == null)
 		return;
 	// var optObj = optarray[optIndex];
 	//var buttonFolder = basket.getColor().parentNode['-buttonFolder'];
 	var selsize = basket.getSize();
+	var collimit = sizebox.maxcolumn;
+	var sizecount = 0;
 	var selindex = -1;
 	var sizeObj;
 	for (var i = 0; i < sizearray.length; i++)
 	{
 		var sizeObj = sizearray[i];
-		/**
-		var trelem = document.createElement('tr');
-		isizelist.appendChild(trelem);
-		**/
+		if (sizecount == 0 || sizecount >= collimit) {
+			trelem = document.createElement('tr');
+			sizebox.domobj.appendChild(trelem);
+			sizecount = 0;
+		}
 		var tdelem = document.createElement('td');
-		isizelist.appendChild(tdelem);
+		trelem.appendChild(tdelem);
+		sizebox.elemarray.push(tdelem);
+		sizecount++;
 		var figelem = document.createElement('figure');
 		figelem.name = i;
 		figelem.style.margin = '0';
@@ -292,17 +304,17 @@ function displaySizeList(isizelist, sizearray)
 			selindex = i;
 	}
 	//alert('sizelist len=' + isizelist.children.length);
-	sizeIndexSelected = setSelected(isizelist, sizeIndexSelected, selindex);
+	sizebox.setSelected(selindex);
 }
 
-function displayMatashitaList(imatashitalist)
+function displayMatashitaList(matashitabox)
 {
-	if (imatashitalist == null)
+	if (matashitabox == null)
 		return;
-	// clearDisplayList(imatashitalist);
+	matashitabox.clear();
 	if (matashitaArray == null)
 	{
-		imatashitalist.style.visibility = 'hidden';
+		matashitabox.domobj.style.visibility = 'hidden';
 		return;
 	}
 	var selMatashita = basket.getMatashita();
@@ -312,7 +324,7 @@ function displayMatashitaList(imatashitalist)
 	for (var i = 0; i < matashitaArray.length; i++)
 	{
 		var optelem = document.createElement('option');
-		imatashitalist.appendChild(optelem);
+		matashitabox.domobj.appendChild(optelem);
 		optelem.value = matashitaArray[i];
 		optelem.appendChild(document.createTextNode(matashitaArray[i]));
 		optelem.setAttribute('onClick', 'chMatashita(this)');
@@ -320,26 +332,25 @@ function displayMatashitaList(imatashitalist)
 			selindex = i;
 	}
 	// alert('matashitaArray len=' + imatashitalist.children.length + ' selindex of ' + selMatashita + ' = ' + selindex);
-	if (imatashitalist.children.length > 0)
+	if (matashitabox.domobj.children.length > 0)
 	{
-		imatashitalist.style.visibility = 'visible';
-		if (selindex >= 0)
-			imatashitalist.selectedIndex = selindex;
+		matashitabox.domobj.style.visibility = 'visible';
+		matashitabox.setSelected(selindex);
 	}
 }
 
-function displayMatashitaSlider(imatashitalist)
+function displayMatashitaSlider(matashitabox)
 {
 	var jscache = basket.jscache;
 
-	if (imatashitalist == null)
+	if (matashitabox == null)
 		return;
 	if (jscache.matashitaArray == null)
 	{
-		imatashitalist.style.visibility = 'hidden';
+		matashitabox.domobj.style.visibility = 'hidden';
 		return;
 	}
-	imatashitalist.style.visibility = 'visible';
+	matashitabox.domobj.style.visibility = 'visible';
 	var selMatashita = basket.getMatashita();
 	if (selMatashita < 0)
 		selMatashita = jscache.matashitaDefault;
@@ -372,7 +383,7 @@ function displayMatashitaSlider(imatashitalist)
 				$('#slidervalue').html('create：' + $(this).slider('value'));
 				basket.setMatashita($(this).slider('value'));
 			},
-			start: function( event, ui ){
+			start: function( event, ui ) {
 				basket.setMatashita(ui.value);
 				$('#slidervalue').html('start：' + ui.value);
 			},
@@ -385,25 +396,5 @@ function displayMatashitaSlider(imatashitalist)
 				$('#slidervalue').html('change：' + ui.value);
 			}
 	});
-/****
- //ボタンを押したら値を100にする
- $("#valueset").click(function(){
-  $("#slider").slider("value",100);
- });
-});
-
-	for (var i = 0; i < matashitaArray.length; i++)
-	{
-		if (selMatashita > 0 && matashitaArray[i] == selMatashita)
-			selindex = i;
-	}
-	// alert('matashitaArray len=' + imatashitalist.children.length + ' selindex of ' + selMatashita + ' = ' + selindex);
-	if (imatashitalist.children.length > 0)
-	{
-		imatashitalist.style.visibility = 'visible';
-		if (selindex >= 0)
-			imatashitalist.selectedIndex = selindex;
-	}
-***/
 }
 -->
