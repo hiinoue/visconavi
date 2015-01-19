@@ -59,7 +59,9 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 #partstab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
 #selectSize {float: left; width: 400px; height: 600px; background-color: white;}
 #SizeData {display: none;}
-#matashita {width: 240px; height: 20px; margin: 5px 0px 3px 8px;}
+#matashitaScale {position: relative;}
+#matashitaScale #text {position: absolute;}
+#matashita {height: 20px; margin: 5px 0px 3px 8px;}
 #matashita_min {width: 50px; height: 20px; border: 0;}
 #matashita_max {width: 50px; height: 20px; border: 0;}
 .c-both {clear: both;}
