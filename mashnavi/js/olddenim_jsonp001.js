@@ -8,7 +8,7 @@ var current_page = 0;
 const page_selspec = 0;
 const page_selway = 1;
 const page_selsize = 2;
-const max_page = 3;
+const max_page = 4;
 
 const display_default = 'inline-block';
 
@@ -329,12 +329,23 @@ function setPage(page)
 			selSpec.style.display = 'none';
 			setAvatar('big', 'small');
 			simu.style.display = display_default;
-			waydiv.style.display = 
+			waydiv.style.display = display_default;
+			opttab.style.display = 
+			partstab.style.display =
+			szdata.style.display = 'none';
+			break;
+		case 2:
+			prev.style.display = display_default;
+			next.style.display = display_default;
+			selSpec.style.display = 'none';
+			setAvatar('big', 'small');
+			simu.style.display = display_default;
+			waydiv.style.display = 'none';
 			opttab.style.display = 
 			partstab.style.display = display_default;
 			szdata.style.display = 'none';
 			break;
-		case 2:
+		case 3:
 			prev.style.display = display_default;
 			next.style.display = display_default;
 			selSpec.style.display = 'none';
@@ -345,7 +356,7 @@ function setPage(page)
 			partstab.style.display = 'none';
 			szdata.style.display = display_default;
 			break;
-		case 3:
+		case 4:
 			prev.style.display = display_default;
 			next.style.display = 'none';
 			selSpec.style.display = 'none';
@@ -433,14 +444,32 @@ function prevPage(event)
 {
 	if (Number(current_page) <= 0)
 		return;
-	setPage(Number(current_page) - 1);
+	switch (current_page)
+	{
+		case 3:
+			var optCache = basket.getOptCache();
+			if (optCache == null ||
+	    		    optCache.length == 0)
+				current_page--;
+		default:
+			setPage(Number(current_page) - 1);
+	}
 }
 
 function nextPage(event)
 {
 	if (Number(current_page) >= Number(max_page))
 		return;
-	setPage(Number(current_page) + 1);
+	switch (current_page)
+	{
+		case 1:
+			var optCache = basket.getOptCache();
+			if (optCache == null ||
+	    		    optCache.length == 0)
+				current_page++;
+		default:
+			setPage(Number(current_page) + 1);
+	}
 	if (Number(current_page) < Number(max_page))
 		return;
 
