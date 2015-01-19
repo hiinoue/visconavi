@@ -348,14 +348,25 @@ function setPage(page)
 	}
 }
 
+var	divwidth;
+var	minwidth;
+var	divheight;
+var	minheight;
 function setAvatar(fstyle, bstyle)
 {
-	var front_back = document.getElementById('front_back');
-	var sstyle = front_back.currentStyle || document.defaultView.getComputedStyle(front_back, '')
-	var divheight = sstyle.height.replace('px', '');
-	var minheight = divheight / 4;
-	var divwidth = sstyle.width.replace('px', '');;
-	var minwidth = divwidth / 4;
+	if (divwidth == null ||
+	    divheight == null) {
+		var front_back = document.getElementById('front_back');
+		var sstyle = front_back.currentStyle || document.defaultView.getComputedStyle(front_back, '')
+		if (divheight == null) {
+			divheight = sstyle.height.replace('px', '');
+			minheight = divheight / 4;
+		}
+		if (divwidth == null) {
+			divwidth = sstyle.width.replace('px', '');;
+			minwidth = divwidth / 4;
+		}
+	}
 	var front = document.getElementById('front');
 	var back = document.getElementById('back');
 	switch (fstyle)
@@ -367,7 +378,6 @@ function setAvatar(fstyle, bstyle)
 			front.style.zIndex = 1;
 			break;
 		case 'medium':
-			front.style.top = '0px';
 			front.style.left = '0px';
 			front.style.top = (divheight / 4) + 'px';
 			front.style.height = (divheight / 2) + 'px';
@@ -390,8 +400,8 @@ function setAvatar(fstyle, bstyle)
 			back.style.zIndex = 1;
 			break;
 		case 'medium':
-			back.style.top = (divheight / 4) + 'px';
 			back.style.left = (divwidth / 2) + 'px';
+			back.style.top = (divheight / 4) + 'px';
 			back.style.height = (divheight / 2) + 'px';
 			back.style.zIndex = 1;
 			break;
@@ -403,6 +413,13 @@ function setAvatar(fstyle, bstyle)
 			back.style.zIndex = 2;
 			break;
 	}
+}
+
+function viewFront() {
+	setAvatar('big', 'small');
+}
+function viewBack() {
+	setAvatar('small', 'big');
 }
 
 function prevPage(event)
