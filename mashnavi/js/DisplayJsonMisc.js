@@ -343,6 +343,8 @@ function displayMatashitaList(matashitabox)
 		matashitabox.setSelected(selindex);
 	}
 }
+
+var pxlpercm = 10;
 function displayMatashitaScale(imatashitaScale)
 {
 	while (imatashitaScale.firstChild) {
@@ -364,8 +366,9 @@ function displayMatashitaScale(imatashitaScale)
 	var step = 2;
 	for (i = min_matashita; i <= max_matashita; i += step)
 	{
-		var tdelem = document.createElement('td');
+		var tdelem = document.createElement('label');
 		imatashitaScale.appendChild(tdelem);
+		tdelem.style.left = ((i - min_matashita) * pxlpercm) + 'px';
 		tdelem.appendChild(document.createTextNode(i));
 	}
 }
@@ -394,12 +397,14 @@ function displayMatashitaSlider(matashitabox)
 		step_matashita = cacheArray[1] - cacheArray[0];
 
 	// alert('matashita min:' + min_matashita + ' max:' + max_matashita + ' step:' + step_matashita + ' value:' + selMatashita);
+	/****
 	// jqeuryを使わない場合
 	var p = document.getElementById('matashita_min');
 	p.childNodes[0].nodeValue = min_matashita + 'cm';
 	// jqueryを使う場合は次のように書く
 	$('#matashita_max')[0].childNodes[0].nodeValue = max_matashita + 'cm';
-	$('#matashita')[0].style.width = ((max_matashita - min_matashita) * 10) + 'px';
+	****/
+	$('#matashita')[0].style.width = ((max_matashita - min_matashita) * pxlpercm) + 'px';
 	$('#matashita').slider({
 			max: max_matashita, //最大値
 			min: min_matashita, //最小値

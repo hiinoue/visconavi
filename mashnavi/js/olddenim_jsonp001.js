@@ -616,6 +616,19 @@ function chMatashita(node)
 	basket.setMatashita(matashita_box.domobj.value);
 }
 
+function minusMatashita()
+{
+	var sliderval = $('#matashita').slider('value');
+	sliderval -= $('#matashita').slider('option', 'step');
+	$('#matashita').slider('value', sliderval);
+}
+function plusMatashita()
+{
+	var sliderval = $('#matashita').slider('value');
+	sliderval += $('#matashita').slider('option', 'step');
+	$('#matashita').slider('value', sliderval);
+}
+
 function chOptImg(node)
 {
 	if (node.name == basket.jscache.getOptIndex())

@@ -24,7 +24,7 @@ background: linear-gradient(to bottom, rgba(255, 255, 200, 0.5), rgba(192, 192, 
 background: -moz-linear-gradient(top, rgba(255, 255, 200, 0.5), rgba(192, 192, 150, 0.5));
 background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 200, 0.5)), to(rgba(192, 192, 150, 0.5)));
 }
-#selectMisc {position: relative; overflow: auto;}
+#selectMisc {position: relative; overflow: auto; width: 1024px;}
 #selectDesign {background-color: white; opacity: 1.0;}
 #itemdiv {float: left; overflow: auto; /* width: 125px; */ height: 650px; background-color: #DDDDDD;}
 #itemtab {height: 600px; overflow: auto;}
@@ -59,11 +59,11 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 #partstab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
 #selectSize {float: left; width: 400px; height: 600px; background-color: white;}
 #SizeData {display: none;}
-#matashitaScale {position: relative;}
-#matashitaScale #text {position: absolute;}
+#matashitaScale {position: relative; height: 20px;}
+#matashitaScale label {position: absolute;}
 #matashita {height: 20px; margin: 5px 0px 3px 8px;}
-#matashita_min {width: 50px; height: 20px; border: 0;}
-#matashita_max {width: 50px; height: 20px; border: 0;}
+#matashita_min {height: 20px; border: 0;}
+#matashita_max {height: 20px; border: 0;}
 .c-both {clear: both;}
 /* tootip—p css */
 .tooltip {
