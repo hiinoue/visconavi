@@ -32,6 +32,13 @@ function select_spec()
 	deliveryDate = null;
 	alert('select_spec() browser=' + navigator.appName + ' agent=' + navigator.userAgent + ' version=' + navigator.appVersion);
 
+	// mobile safariでdraggableやsliderを使用可能にする
+	// https://github.com/furf/jquery-ui-touch-punch
+	var mobileSafari = /webkit.*mobile/i.test(navigator.userAgent)
+	if (mobileSafari) {
+  		$.getScript('js/jquery.ui.touch-punch.min.js');
+	}
+
 	fileSystemApiTest();
 	alert('canvas.toDataURL=' + document.createElement('canvas').toDataURL('image/jpeg').indexOf('data:image/jpeg'));
 
