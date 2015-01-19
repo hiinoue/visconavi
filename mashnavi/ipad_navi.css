@@ -11,7 +11,7 @@
 td:hover {background-color: lightblue;}
 td:active {background-color: red;}
 
-*:not(input,textarea) {
+*:not(input):not(textarea) {
     -webkit-touch-callout: none;
     -webkit-user-select: none; /* Disable selection/Copy of UIWebView */
 }
