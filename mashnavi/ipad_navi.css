@@ -57,7 +57,7 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 
 #opttab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
 #partstab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
-#selectSize {float: left; height: 600px; background-color: white;}
+#selectSize {float: left; width: 400px; height: 600px; background-color: white;}
 #SizeData {display: none;}
 #matashita {width: 240px; height: 20px; margin: 5px 0px 3px 8px;}
 #matashita_min {width: 50px; height: 20px; border: 0;}

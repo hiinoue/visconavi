@@ -128,7 +128,7 @@ function handle_json(jsondata)
 
 	item_box = new DisplayBox(dlist_item, 1);
 	color_box = new DisplayBox(dlist_color, 4);
-	size_box = new DisplayBox(dlist_size, 5);
+	size_box = new DisplayBox(dlist_size, 6);
 	opt_box = new DisplayBox(dlist_opt, 1);
 	parts_box = new DisplayBox(dlist_parts, 1);
 	matashita_box = new DisplayBox(dlist_matashita);
