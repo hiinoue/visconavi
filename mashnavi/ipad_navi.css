@@ -31,11 +31,11 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 #price {height: 50px; margin: 0px;}
 #offline {background-color: yellow; display: none; border-style: none;}
 /* canvas area */
-#avatar_area {float: left; width: 420px; height: 650px; padding: 0px; background-color: #EFEFEF; opacity: 1.0;}
-#front_back {position: relative; width: 400px; height: 600px; padding: 0px; margin: 0px 10px 0px 10px; background-color: white; opacity: 1.0;}
+#avatar_area {float: left; width: 440px; height: 650px; padding: 0px; background-color: #EFEFEF; opacity: 1.0;}
+#front_back {position: relative; width: 420px; height: 600px; padding: 0px; margin: 0px 10px 0px 10px; background-color: white; opacity: 1.0;}
 #white_canvas {position: absolute; top: 0px; left: 0px; height: 600px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
 #front {position: absolute; z-index: 1; top: 0px; left: 0px; height: 600px; margin: 0px 0px 0px 0px; padding: 0px; background-color: yellow;}
-#back {position: absolute; z-index: 2; top: 450px; left: 300px; height: 150px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
+#back {position: absolute; z-index: 2; top: 450px; left: 315px; height: 150px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
 #waydiv {float: left; overflow: auto; width: 410px; height: 650px; margin: 0px 10px; background-color: #DDDDDD;}
 #colortab {width: 400px; height: 600px; overflow-x: hidden; overflow-y: auto; margin: 0px;}
 #colortab table {border-collapse: separate; border-spacing: 0px 0px; width: 400px;}
