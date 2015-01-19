@@ -36,13 +36,14 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 #white_canvas {position: absolute; top: 0px; left: 0px; height: 600px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
 #front {position: absolute; z-index: 1; top: 0px; left: 0px; height: 600px; margin: 0px 0px 0px 0px; padding: 0px; background-color: yellow;}
 #back {position: absolute; z-index: 2; top: 450px; left: 300px; height: 150px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
-#waydiv {float: left; overflow: auto; width: 480px; height: 650px; margin: 0px 10px; background-color: #DDDDDD;}
-#colortab {width: 480px; height: 600px; overflow-x: hidden; overflow-y: auto; margin: 0px;}
-#colortab table {border-collapse: separate; border-spacing: 0px 0px; width: 480px;}
-#colorlist tr {background-color: white; width: 465px;}
+#waydiv {float: left; overflow: auto; width: 410px; height: 650px; margin: 0px 10px; background-color: #DDDDDD;}
+#colortab {width: 400px; height: 600px; overflow-x: hidden; overflow-y: auto; margin: 0px;}
+#colortab table {border-collapse: separate; border-spacing: 0px 0px; width: 400px;}
+#colorlist tr {background-color: white; width: 390px;}
 #colorlist th {padding: 2px;}
-#colorlist td {padding: 0px;}
-#colorlist td figcaption {width: 90px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
+#colorlist td {padding: 0px; width: 80px;}
+#colorlist td img {padding: 0px; width: 80px;}
+#colorlist td figcaption {width: 70px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
 #priceless {height: 50px; margin: 0px;}
 #opttab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
 #partstab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
