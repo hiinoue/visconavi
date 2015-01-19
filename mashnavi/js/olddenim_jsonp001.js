@@ -21,7 +21,7 @@ var matashita_box;
 
 
 var specarray = [{description: ['ゴルフパンツ', 'メンズ'], config: 'catalog/MashNaviItem_golf.js', img: 'catalog/Thumbnail/golf.png'}, 
-		 {description: ['デニムナビ', 'レディースフラット'], config: 'js/MashNaviItem_mobile.js'}
+		 {description: ['デニムナビ', 'レディースフラット'], config: 'catalog/MashNaviItem_mobile.jsonp'}
 		];
 
 var deliveryDate;
@@ -111,7 +111,7 @@ function handle_json(jsondata)
 	/* canvas = document.getElementById('offline');
 	context = canvas.getContext('2d');
 	basket.set_offimage(canvas, context);*/
-						
+
 	var dlist_item = document.getElementById('itemlist');
 	var dlist_color = document.getElementById('colorlist');
 	var dlist_size = document.getElementById('sizelist');
@@ -257,6 +257,7 @@ function setItemNo(itemno)
 	displaySizeList(size_box, basket.getSizeCache());
 	// displayMatashitaList(hlist_matashita);
 	displayMatashitaSlider(matashita_box);
+	displayMatashitaScale(document.getElementById('matashitaScale'));
 }
 
 function displayOptParts(newOptIndex)
@@ -313,29 +314,28 @@ function setPage(page)
 			next.style.display = 'none';
 			selSpec.style.display = display_default;
 			simu.style.display = 'none';
- 			// selSize.style.zIndex = '-1';
 			szdata.style.display = 'none';
 			break;
 		case 1:
 			prev.style.display = display_default;
 			next.style.display = display_default;
 			selSpec.style.display = 'none';
+			setAvatar('big', 'small');
 			simu.style.display = display_default;
 			waydiv.style.display = 
 			opttab.style.display = 
 			partstab.style.display = display_default;
- 			// selSize.style.zIndex = '-1';
 			szdata.style.display = 'none';
 			break;
 		case 2:
 			prev.style.display = display_default;
 			next.style.display = display_default;
 			selSpec.style.display = 'none';
+			setAvatar('medium', 'medium');
 			simu.style.display = display_default;
 			waydiv.style.display = 
 			opttab.style.display = 
 			partstab.style.display = 'none';
- 			selSize.style.zIndex = '3';
 			szdata.style.display = display_default;
 			break;
 		case 3:
@@ -343,8 +343,64 @@ function setPage(page)
 			next.style.display = 'none';
 			selSpec.style.display = 'none';
 			simu.style.display = 'none';
- 			selSize.style.zIndex = '3';
 			szdata.style.display = display_default;
+			break;
+	}
+}
+
+function setAvatar(fstyle, bstyle)
+{
+	var front_back = document.getElementById('front_back');
+	var sstyle = front_back.currentStyle || document.defaultView.getComputedStyle(front_back, '')
+	var divheight = sstyle.height.replace('px', '');
+	var minheight = divheight / 4;
+	var divwidth = sstyle.width.replace('px', '');;
+	var minwidth = divwidth / 4;
+	var front = document.getElementById('front');
+	var back = document.getElementById('back');
+	switch (fstyle)
+	{
+		case 'big':
+			front.style.top = '0px';
+			front.style.left = '0px';
+			front.style.height = divheight + 'px';
+			front.style.zIndex = 1;
+			break;
+		case 'medium':
+			front.style.top = '0px';
+			front.style.left = '0px';
+			front.style.top = (divheight / 4) + 'px';
+			front.style.height = (divheight / 2) + 'px';
+			front.style.zIndex = 1;
+			break;
+		case 'small':
+		default:
+			front.style.top = (divheight - minheight) + 'px';
+			front.style.left = (divwidth - minwidth) + 'px';
+			front.style.height = minheight + 'px';
+			front.style.zIndex = 2;
+			break;
+	}
+	switch (bstyle)
+	{
+		case 'big':
+			back.style.top = '0px';
+			back.style.left = '0px';
+			back.style.height = divheight + 'px';
+			back.style.zIndex = 1;
+			break;
+		case 'medium':
+			back.style.top = (divheight / 4) + 'px';
+			back.style.left = (divwidth / 2) + 'px';
+			back.style.height = (divheight / 2) + 'px';
+			back.style.zIndex = 1;
+			break;
+		case 'small':
+		default:
+			back.style.top = (divheight - minheight) + 'px';
+			back.style.left = (divwidth - minwidth) + 'px';
+			back.style.height = minheight + 'px';
+			back.style.zIndex = 2;
 			break;
 	}
 }

@@ -92,6 +92,7 @@ function displaySpecList(specbox, specarray)
 
 function displayItemList(itembox, itemarray)
 {
+	var dispItemName = true;
 	if (itembox == null)
 		return;
 	itembox.clear();
@@ -110,9 +111,13 @@ function displayItemList(itembox, itemarray)
 		imgelem.src = item['-url'];
 		imgelem.alt = i;
 		imgelem.setAttribute('onClick', 'chItemImg(this)');
-		imgelem.style.width = '100px';
-		// imgelem.style.height = '100px';
 		tdelem.appendChild(imgelem);
+		if (dispItemName) {
+			textelem = document.createElement('span');
+			textelem.setAttribute('class', 'itemlabel');
+			tdelem.appendChild(textelem);
+			textelem.appendChild(document.createTextNode(item['-name']));
+		}
 	}
 }
 
@@ -336,6 +341,32 @@ function displayMatashitaList(matashitabox)
 	{
 		matashitabox.domobj.style.visibility = 'visible';
 		matashitabox.setSelected(selindex);
+	}
+}
+function displayMatashitaScale(imatashitaScale)
+{
+	while (imatashitaScale.firstChild) {
+		imatashitaScale.removeChild(imatashitaScale.firstChild);
+	}
+	
+	var jscache = basket.jscache;
+
+	if (jscache.matashitaArray == null)
+	{
+		imatashitaScale.style.visibility = 'hidden';
+		return;
+	}
+	imatashitaScale.style.visibility = 'visible';
+
+	var cacheArray = jscache.matashitaArray;
+	var min_matashita = cacheArray[0];
+	var max_matashita = cacheArray[cacheArray.length - 1];
+	var step = 2;
+	for (i = min_matashita; i <= max_matashita; i += step)
+	{
+		var tdelem = document.createElement('td');
+		imatashitaScale.appendChild(tdelem);
+		tdelem.appendChild(document.createTextNode(i));
 	}
 }
 
