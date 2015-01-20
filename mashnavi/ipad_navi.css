@@ -57,13 +57,15 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 
 #opttab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
 #partstab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
-#selectSize {float: left; width: 400px; height: 600px; background-color: white;}
-#SizeData {display: none;}
-#matashitaScale {position: relative; height: 20px;}
+
+#SizeData {display: none; width: 400px; height: 650px; padding: 0px;}
+#selectSize {float: left; width: 400px; height: 600px; background-color: white;}#matashitaScale {position: relative; height: 20px;}
 #matashitaScale label {position: absolute;}
 #matashita {height: 20px; margin: 5px 0px 3px 8px;}
 #matashita_min {height: 20px; border: 0;}
 #matashita_max {height: 20px; border: 0;}
+#sizefill {height: 50px; margin: 0px;}
+
 .c-both {clear: both;}
 /* tootip—p css */
 .tooltip {

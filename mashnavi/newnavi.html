@@ -8,7 +8,7 @@
 <title>canvasでImageを描く</title>
 <script src="js/BasketJ.js" language="javascript"></script>
 <script src="js/DisplayJsonMisc.js" language="javascript"></script>
-<script src="js/MakeJsonArray.js" language="javascript"></script>
+<script src="js/makeJsonArray.js" language="javascript"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
 <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
@@ -31,7 +31,7 @@
 	    <div id="selectSpec">
 	     <div id="spectab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
 	      <table>
-	       <tbody id="speclist" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	       <tbody id="speclist">
 	       </tbody>
 	      </table>
 	     </div>
@@ -42,7 +42,7 @@
 	     <div id="itemdiv" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
 	      <div id="itemtab">
 	       <table>
-	        <tbody id="itemlist" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	        <tbody id="itemlist">
 	        </tbody>
 	       </table>
 	      </div>
@@ -50,7 +50,7 @@
     		<button type="button" id="nextview" onClick="nextPage()">次頁</button>
 	      </span>
 	     </div>
-	     <div id="avatar_area" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
+	     <div id="avatar_area">
 	      <span id="front_back" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
 	       <!-- canvas width="300" height="850" id="offline">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
@@ -71,25 +71,24 @@
 	      </span>
 	     </div>
 	     <div id="waydiv" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
-	      <div id="colortab" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	      <div id="colortab">
 	       <table>
-	        <tbody id="colorlist" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	        <tbody id="colorlist">
 	        </tbody>
 	       </table>
 	      </div>
 	      <span id="priceless">
-    		<button type="button" id="prevview" onClick="prevPage()">前頁</button>
 	      </span>
 	     </div>
-	     <div id="opttab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)" >
+	     <div id="opttab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
 	      <table>
-	       <tbody id="optlist" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	       <tbody id="optlist">
 	       </tbody>
 	      </table>
 	     </div>
 	     <div id="partstab" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
 	      <table>
-	       <tbody id="partslist" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	       <tbody id="partslist">
 	       </tbody>
 	      </table>
 	     </div>
@@ -128,10 +127,12 @@
 		</table>
 	        <div id="slidervalue"></div>
 	    </div>
+	    <span id="sizefill">
+	    </span>
 	    <!-- div>
 		<form id="upload-form" method="post" enctype="multipart/form-data">
-			<!-- textarea id="upload-filename" name="FileName" size="27">PN000011.xml</textarea -->
-			<!-- textarea id="upload-content" name="orderSend" size="27">del="yes"</textarea -->
+			<textarea id="upload-filename" name="FileName" size="27">PN000011.xml</textarea>
+			<textarea id="upload-content" name="orderSend" size="27">del="yes"</textarea>
 		</form>
 	    </div -->
       </td>
