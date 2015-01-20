@@ -30,8 +30,8 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 #itemtab {height: 600px; overflow: auto;}
 #itemtab table {border-collapse: separate; border-spacing: 10px 10px;}
 #itemtab tr {background-color: white;}
-#itemtab td {position: relative;}
-#itemtab img {width: 100px;}
+#itemtab td {position: relative; width: 102px; height: 130px;}
+#itemtab img {position: absolute; left: 45px; top: 0px; width: 50px;}
 .itemlabel {position: absolute; top: 100px; left: 10px; width: 90px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
 #price {height: 50px; margin: 0px;}
 #offline {background-color: yellow; display: none; border-style: none;}
