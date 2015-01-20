@@ -20,8 +20,8 @@ var parts_box;
 var matashita_box;
 
 
-var specarray = [{description: ['ゴルフパンツ', 'メンズ'], config: 'catalog/MashNaviItem_golf.js', img: 'catalog/Thumbnail/golf.png'}, 
-		 {description: ['デニムナビ', 'レディースフラット'], config: 'catalog/MashNaviItem_mobile.jsonp'}
+var specarray = [{description: ['ゴルフパンツ', 'メンズ'], config: 'js/MashNaviItem_golf.js', img: 'catalog/Thumbnail/golf.png'}, 
+		 {description: ['デニムナビ', 'レディースフラット'], config: 'js/MashNaviItem_mobile.jsonp'}
 		];
 
 var deliveryDate;
@@ -30,7 +30,7 @@ function select_spec()
 {
 	setPage(current_page);
 	deliveryDate = null;
-	alert('select_spec() browser=' + navigator.appName + ' agent=' + navigator.userAgent + ' version=' + navigator.appVersion);
+	// alert('select_spec() browser=' + navigator.appName + ' agent=' + navigator.userAgent + ' version=' + navigator.appVersion);
 
 	// mobile safariでdraggableやsliderを使用可能にする
 	// https://github.com/furf/jquery-ui-touch-punch
@@ -40,7 +40,7 @@ function select_spec()
 	}
 
 	fileSystemApiTest();
-	alert('canvas.toDataURL=' + document.createElement('canvas').toDataURL('image/jpeg').indexOf('data:image/jpeg'));
+	// alert('canvas.toDataURL=' + document.createElement('canvas').toDataURL('image/jpeg').indexOf('data:image/jpeg'));
 
 	var spec_box = new DisplayBox(document.getElementById('speclist'));
 	displaySpecList(spec_box, specarray);
@@ -61,7 +61,7 @@ function select_spec()
 		replyDate = order[0].getAttribute('deliveryDate'); */
 		var replyDate = data.documentElement.getAttribute('deliveryDate');
 		deliveryDate = replyDate.replace(/\//g, '-'); // 年月日の区切りを/から-に替える
-		alert('納期=' + deliveryDate);
+		// alert('納期=' + deliveryDate);
 	    })
 	  .fail(function(jqXHR, status, errorThrown) {
 		alert('エラー発生 status=' + status + ',' + jqXHR.responseText + ':' + errorThrown);
@@ -653,13 +653,57 @@ function chPartsImg(opt)
 
 function tableTouch(event)
 {
-	console.log('tableTouch type=' + event.type + ' tag=' + event.currentTarget.tagName + ' name=' + event.target.localName);
 	event.stopPropagation();
+	var curTarget = event.currentTarget;
+	var target = event.target;
+	console.log('tableTouch type=' + event.type + ' current=(' + curTarget.tagName + ',' + curTarget.id + ') src=(' + target.tagName + ',' + target.id + ')');
+	switch (curTarget.id) {
+		case 'front_back':
+		case 'waydiv':
+		// case 'colorlist':
+			event.preventDefault();
+			break;
+		default:
+	}
+	switch (curTarget.tagName.toLowerCase()) {
+		case 'table':
+		case 'TABLE':
+			console.log('tableTouch preventDefault');
+			event.preventDefault();
+			break;
+		default:
+	}
+	switch (event.target.tagName.toLowerCase()) {
+		case 'div':
+		case 'table':
+		case 'DIV':
+			console.log('tableTouch preventDefault 2');
+			event.preventDefault();
+			break;
+		default:
+	}
 }
 
 function bodyTouch(event)
 {
-	console.log('bodyTouch type=' + event.type + ' tag=' + event.currentTarget.tagName + ' name=' + event.target.localName);
+	event.stopPropagation();
+	var curTarget = event.currentTarget;
+	var target = event.target;
+	console.log('bodyTouch type=' + event.type + ' current=(' + curTarget.tagName + ',' + curTarget.id + ') src=(' + target.tagName + ',' + target.id + ')');
+	switch (curTarget.tagName.toLowerCase()) {
+		case 'body':
+			if (target.tagName.toLowerCase() != 'button')
+				event.preventDefault();
+			break;
+		default:
+	}
+	switch (target.tagName.toLowerCase()) {
+		case 'body':
+		case 'div':
+			event.preventDefault();
+			break;
+		default:
+	}
 }
 
 function bodyGesture(event)
