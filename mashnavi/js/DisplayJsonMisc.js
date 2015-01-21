@@ -124,7 +124,7 @@ function displayItemList(itembox, itemarray)
 function displayColorList(colorbox, colorarray)
 {
 	var rowPerType = true;
-	var useTooltip = true;
+	var useTooltip = false;
 	var tType = null, type;
 	var collimit = colorbox.maxcolumn;
 	var waycount = 0;

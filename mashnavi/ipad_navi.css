@@ -51,10 +51,10 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 #colortab {width: 800px; height: 1320px; overflow-x: hidden; overflow-y: auto; margin: 0px;}
 #colortab table {border-collapse: separate; border-spacing: 0px 0px; width: 800px;}
 #colorlist tr {background-color: white; width: 780px;}
-#colorlist th {padding: 4px; width: 132px;}
+#colorlist th {padding: 4px; width: 132px; font-size: xx-large;}
 #colorlist td {padding: 0px; width: 160px;}
 #colorlist td img {padding: 0px; width: 160px;}
-#colorlist td figcaption {width: 140px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
+#colorlist td figcaption {width: 140px; white-space: nowrap; overflow: hidden; text-overflow: clip; font-size: x-large;}
 #priceless {height: 100px; margin: 0px;}
 
 #opttab {float: left; overflow: auto; width: 250px; height: 1320px; visibility: visible;}
