@@ -27,27 +27,27 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 }
 #selectMisc {position: relative; overflow: auto; width: 2048px;}
 #selectDesign {background-color: white; opacity: 1.0;}
-#itemdiv {float: left; overflow: auto; /* width: 125px; */ height: 1300px; background-color: #DDDDDD;}
-#itemtab {height: 1200px; overflow: auto;}
+#itemdiv {float: left; overflow: auto; /* width: 125px; */ height: 1420px; background-color: #DDDDDD;}
+#itemtab {height: 1320px; overflow: auto;}
 #itemtab table {border-collapse: separate; border-spacing: 20px 20px;}
 #itemtab tr {background-color: white;}
-#itemtab td {position: relative; width: 200px; height: 260px;}
-#itemtab img {position: absolute; left: 90px; top: 0px; width: 100px;}
-.itemlabel {position: absolute; top: 220px; left: 20px; width: 180px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
+#itemtab td {position: relative; width: 256px; height: 260px;} /* widthÇ™257pxà»è„ÇæÇ∆ëSëÃÇ™ÇÕÇ›èoÇÈ */
+#itemtab img {position: absolute; left: 140px; top: 0px; width: 100px;}
+.itemlabel {position: absolute; top: 230px; left: 20px; width: 230px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
 #price {height: 100px; margin: 0px;}
 #offline {background-color: yellow; display: none; border-style: none;}
 /* canvas area */
-#avatar_area {float: left; width: 880px; height: 1300px; padding: 0px; background-color: #EFEFEF; opacity: 1.0;}
-#front_back {position: relative; width: 840px; height: 1200px; padding: 0px; margin: 0px 10px 0px 10px; background-color: white; opacity: 1.0;}
-#white_canvas {position: absolute; top: 0px; left: 0px; height: 1200px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
-#front {position: absolute; z-index: 1; top: 0px; left: 0px; height: 1200px; margin: 0px 0px 0px 0px; padding: 0px; background-color: yellow;}
-#back {position: absolute; z-index: 2; top: 900px; left: 630px; height: 300px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
-#view_front_back {position: relative; top: 1200px; height: 100px; margin: 0px; z-index: 3;}
+#avatar_area {float: left; width: 900px; height: 1420px; padding: 0px; background-color: #EFEFEF; opacity: 1.0;}
+#front_back {position: relative; width: 880px; height: 1320px; padding: 0px; margin: 0px 10px 0px 10px; background-color: white; opacity: 1.0;}
+#white_canvas {position: absolute; top: 0px; left: 0px; height: 1320px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
+#front {position: absolute; z-index: 1; top: 0px; left: 0px; height: 1320px; margin: 0px 0px 0px 0px; padding: 0px; background-color: yellow;}
+#back {position: absolute; z-index: 2; top: 900px; left: 660px; height: 9900px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
+#view_front_back {position: relative; top: 1320px; height: 100px; margin: 0px; z-index: 3;}
 #view_front {position: absolute; left: 600px; top: 10px; font-size: medium;}
 #view_back {position: absolute; left: 700px; top: 10px; font-size: medium;}
 
-#waydiv {float: left; overflow: auto; width: 820px; height: 1300px; margin: 0px 10px; background-color: #DDDDDD;}
-#colortab {width: 800px; height: 1200px; overflow-x: hidden; overflow-y: auto; margin: 0px;}
+#waydiv {float: left; overflow: auto; width: 820px; height: 1420px; margin: 0px 10px; background-color: #DDDDDD;}
+#colortab {width: 800px; height: 1320px; overflow-x: hidden; overflow-y: auto; margin: 0px;}
 #colortab table {border-collapse: separate; border-spacing: 0px 0px; width: 800px;}
 #colorlist tr {background-color: white; width: 780px;}
 #colorlist th {padding: 4px; width: 132px;}
@@ -56,11 +56,11 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 #colorlist td figcaption {width: 140px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
 #priceless {height: 100px; margin: 0px;}
 
-#opttab {float: left; overflow: auto; width: 250px; height: 1200px; visibility: visible;}
-#partstab {float: left; overflow: auto; width: 250px; height: 1200px; visibility: visible;}
+#opttab {float: left; overflow: auto; width: 250px; height: 1320px; visibility: visible;}
+#partstab {float: left; overflow: auto; width: 250px; height: 1320px; visibility: visible;}
 
-#SizeData {display: none; width: 800px; height: 1300px; padding: 0px;}
-#selectSize {float: left; width: 800px; height: 1200px; background-color: white;}
+#SizeData {display: none; width: 800px; height: 1420px; padding: 0px;}
+#selectSize {float: left; width: 800px; height: 1320px; background-color: white;}
 #selectSize figure {font-size: xx-large;}
 #selectSize label {font-size: xx-large;}
 #matashitaScale {position: relative; height: 40px;}
