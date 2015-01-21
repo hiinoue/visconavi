@@ -344,7 +344,7 @@ function displayMatashitaList(matashitabox)
 	}
 }
 
-var pxlpercm = 10;
+var pxlpercm = 20;
 function displayMatashitaScale(imatashitaScale)
 {
 	while (imatashitaScale.firstChild) {

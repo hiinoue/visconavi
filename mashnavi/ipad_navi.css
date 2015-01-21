@@ -33,7 +33,7 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 #itemtab tr {background-color: white;}
 #itemtab td {position: relative; width: 200px; height: 260px;}
 #itemtab img {position: absolute; left: 90px; top: 0px; width: 100px;}
-.itemlabel {position: absolute; top: 200px; left: 20px; width: 180px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
+.itemlabel {position: absolute; top: 220px; left: 20px; width: 180px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
 #price {height: 100px; margin: 0px;}
 #offline {background-color: yellow; display: none; border-style: none;}
 /* canvas area */
@@ -50,7 +50,7 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 #colortab {width: 800px; height: 1200px; overflow-x: hidden; overflow-y: auto; margin: 0px;}
 #colortab table {border-collapse: separate; border-spacing: 0px 0px; width: 800px;}
 #colorlist tr {background-color: white; width: 780px;}
-#colorlist th {padding: 4px;}
+#colorlist th {padding: 4px; width: 132px;}
 #colorlist td {padding: 0px; width: 160px;}
 #colorlist td img {padding: 0px; width: 160px;}
 #colorlist td figcaption {width: 140px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
@@ -61,11 +61,14 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 
 #SizeData {display: none; width: 800px; height: 1300px; padding: 0px;}
 #selectSize {float: left; width: 800px; height: 1200px; background-color: white;}
+#selectSize figure {font-size: xx-large;}
+#selectSize label {font-size: xx-large;}
 #matashitaScale {position: relative; height: 40px;}
-#matashitaScale label {position: absolute; font-size: medium;}
+#matashitaScale label {position: absolute; font-size: xx-large;}
 #matashita {height: 40px; margin: 10px 0px 6px 16px;}
 #matashita_min {height: 40px; border: 0; font-size: medium;}
 #matashita_max {height: 40px; border: 0; font-size: medium;}
+#slidervalue {font-size: xx-large;}
 #sizefill {height: 100px; margin: 0px;}
 
 .c-both {clear: both;}
