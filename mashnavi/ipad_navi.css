@@ -3,7 +3,7 @@
 	background: -moz-linear-gradient(top, #FF9, #9C0);
 	background: -webkit-gradient(linear, left top, left bottom, from(#FF9), to(#9C0));
 }
-#action button {margin-left: 10px; border-radius: 5px; border-style: outset;
+#action button {margin-left: 20px; border-radius: 10px; border-style: outset;
 	background: linear-gradient(to bottom, #CFF, #6CC);
 	background: -moz-linear-gradient(top, #CFF, #6CC);
 	background: -webkit-gradient(linear, left top, left bottom, from(#CFF), to(#6CC));
@@ -16,55 +16,57 @@ td:active {background-color: red;}
     -webkit-user-select: none; /* Disable selection/Copy of UIWebView */
 }
 
-#prev {display: none;}
+#prev {display: none; font-size: medium;}
+#next {font-size: medium;}
 #selectSpec {background-color: white; opacity: 1.0; }
-#spectab figure, #optlist figure, #sizelist figure {border-radius: 5px; border-style: outset;}
+#spectab figure, #optlist figure, #sizelist figure {border-radius: 10px; border-style: outset;}
 #spectab figure, #opttab figure, #sizelist figure {
 background: linear-gradient(to bottom, rgba(255, 255, 200, 0.5), rgba(192, 192, 150, 0.5));
 background: -moz-linear-gradient(top, rgba(255, 255, 200, 0.5), rgba(192, 192, 150, 0.5));
 background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 200, 0.5)), to(rgba(192, 192, 150, 0.5)));
 }
-#selectMisc {position: relative; overflow: auto; width: 1024px;}
+#selectMisc {position: relative; overflow: auto; width: 2048px;}
 #selectDesign {background-color: white; opacity: 1.0;}
-#itemdiv {float: left; overflow: auto; /* width: 125px; */ height: 650px; background-color: #DDDDDD;}
-#itemtab {height: 600px; overflow: auto;}
-#itemtab table {border-collapse: separate; border-spacing: 10px 10px;}
+#itemdiv {float: left; overflow: auto; /* width: 125px; */ height: 1300px; background-color: #DDDDDD;}
+#itemtab {height: 1200px; overflow: auto;}
+#itemtab table {border-collapse: separate; border-spacing: 20px 20px;}
 #itemtab tr {background-color: white;}
-#itemtab td {position: relative; width: 102px; height: 130px;}
-#itemtab img {position: absolute; left: 45px; top: 0px; width: 50px;}
-.itemlabel {position: absolute; top: 100px; left: 10px; width: 90px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
-#price {height: 50px; margin: 0px;}
+#itemtab td {position: relative; width: 200px; height: 260px;}
+#itemtab img {position: absolute; left: 90px; top: 0px; width: 100px;}
+.itemlabel {position: absolute; top: 200px; left: 20px; width: 180px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
+#price {height: 100px; margin: 0px;}
 #offline {background-color: yellow; display: none; border-style: none;}
 /* canvas area */
-#avatar_area {float: left; width: 440px; height: 650px; padding: 0px; background-color: #EFEFEF; opacity: 1.0;}
-#front_back {position: relative; width: 420px; height: 600px; padding: 0px; margin: 0px 10px 0px 10px; background-color: white; opacity: 1.0;}
-#white_canvas {position: absolute; top: 0px; left: 0px; height: 600px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
-#front {position: absolute; z-index: 1; top: 0px; left: 0px; height: 600px; margin: 0px 0px 0px 0px; padding: 0px; background-color: yellow;}
-#back {position: absolute; z-index: 2; top: 450px; left: 315px; height: 150px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
-#view_front_back {position: relative; top: 600px; height: 50px; margin: 0px;}
-#view_front {position: absolute; left: 300px; top: 5px;}
-#view_back {position: absolute; left: 350px; top: 5px;}
+#avatar_area {float: left; width: 880px; height: 1300px; padding: 0px; background-color: #EFEFEF; opacity: 1.0;}
+#front_back {position: relative; width: 840px; height: 1200px; padding: 0px; margin: 0px 10px 0px 10px; background-color: white; opacity: 1.0;}
+#white_canvas {position: absolute; top: 0px; left: 0px; height: 1200px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
+#front {position: absolute; z-index: 1; top: 0px; left: 0px; height: 1200px; margin: 0px 0px 0px 0px; padding: 0px; background-color: yellow;}
+#back {position: absolute; z-index: 2; top: 900px; left: 630px; height: 300px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
+#view_front_back {position: relative; top: 1200px; height: 100px; margin: 0px;}
+#view_front {position: absolute; left: 600px; top: 10px; font-size: medium;}
+#view_back {position: absolute; left: 700px; top: 10px; font-size: medium;}
 
-#waydiv {float: left; overflow: auto; width: 410px; height: 650px; margin: 0px 10px; background-color: #DDDDDD;}
-#colortab {width: 400px; height: 600px; overflow-x: hidden; overflow-y: auto; margin: 0px;}
-#colortab table {border-collapse: separate; border-spacing: 0px 0px; width: 400px;}
-#colorlist tr {background-color: white; width: 390px;}
-#colorlist th {padding: 2px;}
-#colorlist td {padding: 0px; width: 80px;}
-#colorlist td img {padding: 0px; width: 80px;}
-#colorlist td figcaption {width: 70px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
-#priceless {height: 50px; margin: 0px;}
+#waydiv {float: left; overflow: auto; width: 820px; height: 1300px; margin: 0px 10px; background-color: #DDDDDD;}
+#colortab {width: 800px; height: 1200px; overflow-x: hidden; overflow-y: auto; margin: 0px;}
+#colortab table {border-collapse: separate; border-spacing: 0px 0px; width: 800px;}
+#colorlist tr {background-color: white; width: 780px;}
+#colorlist th {padding: 4px;}
+#colorlist td {padding: 0px; width: 160px;}
+#colorlist td img {padding: 0px; width: 160px;}
+#colorlist td figcaption {width: 140px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
+#priceless {height: 100px; margin: 0px;}
 
-#opttab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
-#partstab {float: left; overflow: auto; width: 125px; height: 600px; visibility: visible;}
+#opttab {float: left; overflow: auto; width: 250px; height: 1200px; visibility: visible;}
+#partstab {float: left; overflow: auto; width: 250px; height: 1200px; visibility: visible;}
 
-#SizeData {display: none; width: 400px; height: 650px; padding: 0px;}
-#selectSize {float: left; width: 400px; height: 600px; background-color: white;}#matashitaScale {position: relative; height: 20px;}
-#matashitaScale label {position: absolute;}
-#matashita {height: 20px; margin: 5px 0px 3px 8px;}
-#matashita_min {height: 20px; border: 0;}
-#matashita_max {height: 20px; border: 0;}
-#sizefill {height: 50px; margin: 0px;}
+#SizeData {display: none; width: 800px; height: 1300px; padding: 0px;}
+#selectSize {float: left; width: 800px; height: 1200px; background-color: white;}
+#matashitaScale {position: relative; height: 40px;}
+#matashitaScale label {position: absolute; font-size: medium;}
+#matashita {height: 40px; margin: 10px 0px 6px 16px;}
+#matashita_min {height: 40px; border: 0; font-size: medium;}
+#matashita_max {height: 40px; border: 0; font-size: medium;}
+#sizefill {height: 100px; margin: 0px;}
 
 .c-both {clear: both;}
 /* tootip—p css */

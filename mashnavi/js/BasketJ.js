@@ -369,7 +369,13 @@ Basket.prototype.redraw = function(ifPending) {
 		var tgt_height = imghgt;
 		var adjustWidth = false;
 		var adjustHeight = false;
-		if (tgt_width > spec_width)
+		var w_rate = Math.floor(spec_width / tgt_width);
+		var h_rate = Math.floor(spec_height / tgt_height);
+		if (Number(w_rate) >= 1.0 && Number(h_rate) >= 1.0) {
+			var wh_rate = Number(w_rate) > Number(h_rate) ? h_rate : w_rate;
+			tgt_width *= wh_rate;
+			tgt_height *= wh_rate;
+		} else if (tgt_width > spec_width)
 		{
 			if (tgt_height > spec_height)
 			{

@@ -2,13 +2,14 @@
 <html manifest="vasconavi.manifest">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<!--meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5, user-scalable=no"-->
+<meta name="viewport" content="width=device-width,initial-scale=0.5,minimum-scale=0.5,maximum-scale=0.5,user-scalable=no" />
 <link rel="stylesheet" href="ipad_navi.css"　type="text/css">
 
 <title>canvasでImageを描く</title>
 <script src="js/BasketJ.js" language="javascript"></script>
 <script src="js/DisplayJsonMisc.js" language="javascript"></script>
-<script src="js/makeJsonArray.js" language="javascript"></script>
+<script src="js/MakeJsonArray.js" language="javascript"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
 <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
@@ -55,13 +56,13 @@
 	       <!-- canvas width="300" height="850" id="offline">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
 	       </canvas -->
-	       <canvas id="white_canvas" width="630" height="900" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
+	       <canvas id="white_canvas" width="1260" height="1800" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
 	       </canvas>
-	       <canvas id="front" width="630" height="900" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
+	       <canvas id="front" width="1260" height="1800" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
 	       </canvas>
-	       <canvas id="back" width="630" height="900" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
+	       <canvas id="back" width="1260" height="1800" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
 	       </canvas>
 	      </span>
