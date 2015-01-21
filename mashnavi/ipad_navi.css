@@ -16,8 +16,9 @@ td:active {background-color: red;}
     -webkit-user-select: none; /* Disable selection/Copy of UIWebView */
 }
 
-#prev {display: none; font-size: medium;}
-#next {font-size: medium;}
+#action {width: 2048px; height: 90px; padding: 0px; margin: 0px;}
+#prev {display: none; font-size: x-large;}
+#next {font-size: x-large;}
 #selectSpec {background-color: white; opacity: 1.0; }
 #spectab figure, #optlist figure, #sizelist figure {border-radius: 10px; border-style: outset;}
 #spectab figure, #opttab figure, #sizelist figure {
@@ -59,8 +60,8 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 #opttab {float: left; overflow: auto; width: 250px; height: 1320px; visibility: visible;}
 #partstab {float: left; overflow: auto; width: 250px; height: 1320px; visibility: visible;}
 
-#SizeData {display: none; width: 800px; height: 1420px; padding: 0px;}
-#selectSize {float: left; width: 800px; height: 1320px; background-color: white;}
+#SizeData {display: none; width: 840px; height: 1420px; padding: 0px;}
+#selectSize {float: left; width: 840px; height: 1320px; background-color: white;}
 #selectSize figure {font-size: xx-large;}
 #selectSize label {font-size: xx-large;}
 #matashitaScale {position: relative; height: 40px;}
