@@ -40,7 +40,7 @@
       </td>
       <td id="simulation">
 	    <div id="selectDesign">
-	     <div id="itemdiv" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	     <div id="itemdiv" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
 	      <div id="itemtab">
 	       <table>
 	        <tbody id="itemlist">
@@ -52,17 +52,17 @@
 	      </span>
 	     </div>
 	     <div id="avatar_area">
-	      <span id="front_back" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	      <span id="front_back" onTouchStart="canvasTouch(event)" onTouchMove="canvasTouch(event)">
 	       <!-- canvas width="300" height="850" id="offline">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
 	       </canvas -->
-	       <canvas id="white_canvas" width="1260" height="1800" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
+	       <canvas id="white_canvas" width="1260" height="1800" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)" onTouchStart="canvasTouch(event)" onTouchMove="canvasTouch(event)">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
 	       </canvas>
-	       <canvas id="front" width="1260" height="1800" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
+	       <canvas id="front" width="1260" height="1800" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)" onTouchStart="canvasTouch(event)" onTouchMove="canvasTouch(event)">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
 	       </canvas>
-	       <canvas id="back" width="1260" height="1800" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)">
+	       <canvas id="back" width="1260" height="1800" ongesturestart="canvasGestureStart(event)" ongesturechange="canvasGesture(event)" onTouchStart="canvasTouch(event)" onTouchMove="canvasTouch(event)">
 	     図形を表示するには、canvasタグをサポートしたブラウザが必要です。
 	       </canvas>
 	      </span>
@@ -71,7 +71,7 @@
     		<button type="button" id="view_back" onClick="viewBack()">後</button>
 	      </span>
 	     </div>
-	     <div id="waydiv" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)" onTouchStart="tableTouch(event)" onTouchMove="tableTouch(event)">
+	     <div id="waydiv" ongesturestart="suppressGesture(event)" ongesturechange="suppressGesture(event)">
 	      <div id="colortab">
 	       <table>
 	        <tbody id="colorlist">

@@ -651,8 +651,24 @@ function chPartsImg(opt)
 }
 
 
+function canvasTouch(event)
+{
+	event.stopPropagation();
+	var curTarget = event.currentTarget;
+	var target = event.target;
+	console.log('canvasTouch type=' + event.type + ' current=(' + curTarget.tagName + ',' + curTarget.id + ') src=(' + target.tagName + ',' + target.id + ')');
+	switch (curTarget.id) {
+		case 'front_back':
+			event.preventDefault();
+			break;
+		default:
+			break;
+	}
+}
+
 function tableTouch(event)
 {
+	/***
 	event.stopPropagation();
 	var curTarget = event.currentTarget;
 	var target = event.target;
@@ -682,10 +698,12 @@ function tableTouch(event)
 			break;
 		default:
 	}
+	***/
 }
 
 function bodyTouch(event)
 {
+	/***
 	event.stopPropagation();
 	var curTarget = event.currentTarget;
 	var target = event.target;
@@ -704,6 +722,7 @@ function bodyTouch(event)
 			break;
 		default:
 	}
+	***/
 }
 
 function bodyGesture(event)

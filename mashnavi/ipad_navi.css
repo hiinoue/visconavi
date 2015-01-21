@@ -42,7 +42,7 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 #white_canvas {position: absolute; top: 0px; left: 0px; height: 1200px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
 #front {position: absolute; z-index: 1; top: 0px; left: 0px; height: 1200px; margin: 0px 0px 0px 0px; padding: 0px; background-color: yellow;}
 #back {position: absolute; z-index: 2; top: 900px; left: 630px; height: 300px; margin: 0px 0px 0px 0px; padding: 0px; background-color: white;}
-#view_front_back {position: relative; top: 1200px; height: 100px; margin: 0px;}
+#view_front_back {position: relative; top: 1200px; height: 100px; margin: 0px; z-index: 3;}
 #view_front {position: absolute; left: 600px; top: 10px; font-size: medium;}
 #view_back {position: absolute; left: 700px; top: 10px; font-size: medium;}
 
