@@ -35,7 +35,13 @@ background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 
 #itemtab td {position: relative; width: 256px; height: 260px;} /* widthÇ™257pxà»è„ÇæÇ∆ëSëÃÇ™ÇÕÇ›èoÇÈ */
 #itemtab img {position: absolute; left: 140px; top: 0px; width: 100px;}
 .itemlabel {position: absolute; top: 230px; left: 20px; width: 230px; white-space: nowrap; overflow: hidden; text-overflow: clip;}
-#price {height: 100px; margin: 0px;}
+#price {position: relative; height: 100px; width: 298px; margin: 0px;}
+#itemFinished {position: absolute; left: 20px; top: 55px; width: 210px; font-size: medium; color: white;
+	background: linear-gradient(to bottom, #FFC, #CC6);
+	background: -moz-linear-gradient(top, #F9C, #C66);
+	background: -webkit-gradient(linear, left top, left bottom, from(#F9C), to(#C66));
+}
+
 #offline {background-color: yellow; display: none; border-style: none;}
 /* canvas area */
 #avatar_area {float: left; width: 900px; height: 1420px; padding: 0px; background-color: #EFEFEF; opacity: 1.0;}
